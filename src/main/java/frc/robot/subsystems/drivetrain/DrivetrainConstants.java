@@ -24,8 +24,24 @@ public class DrivetrainConstants {
     public static class DriveToPose{
         public static final TrapezoidProfile.Constraints AUTO_CONSTRAINTS =
                 new TrapezoidProfile.Constraints(0, 0);
+
         public static final TrapezoidProfile.Constraints TELE_CONSTRAINTS =
                 new TrapezoidProfile.Constraints(0, 0);
+
+        public static final double MIN_DISTANCE_VELOCITY_CORRECTION = 0.02;
+
+        public static final double MIN_SET_POINT_VELOCITY = 0.5;
+
+        /**
+         * the distance which above the FF is at 100% and below is 100%-0%.
+         */
+        public static final double FF_MAX_DISTANCE = 0.03;
+
+        /**
+         * the distance which above the FF is at 0%-100% and below is 0%.
+         */
+        public static final double FF_MIN_DISTANCE = 0.01;
+
     }
 
     public static boolean shouldFlipPath(){

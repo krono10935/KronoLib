@@ -1,16 +1,19 @@
 package frc.robot.commands.auto;
 
-import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import frc.robot.subsystems.drivetrain.DrivetrainConstants;
-import frc.robot.subsystems.drivetrain.swerve.Swerve;
 import io.github.captainsoccer.basicmotor.LogFrame;
 
 import java.util.function.Supplier;
@@ -18,14 +21,21 @@ import java.util.function.Supplier;
 
 public class DriveToPoseCommand extends Command {
     private Drivetrain drivetrain;
-    private Supplier<Pose2d> targetPose;
+    private Supplier<Pose2d> goalPose;
     private final Supplier<Pose2d> robotPose;
     private TrapezoidProfile driveProfile;
-    private Translation2d lastSetpointVelocity = Translation2d.kZero;
+    private final Supplier<ChassisSpeeds> chassisSpeedSupplier;
+    private TrapezoidProfile.State lastState;
+    private Translation2d lastSetPoint;
+    private Vector<N2> lastSetpointVelocity;
+    private final static TrapezoidProfile.State GOAL_STATE = new State(0,0);
+    private final PIDController drivePIDController;
 
 
-    public DriveToPoseCommand(Drivetrain drivetrain, Supplier<Pose2d> targetPose) {
+    public DriveToPoseCommand(Drivetrain drivetrain, Supplier<Pose2d> targetPose, Supplier<ChassisSpeeds> chassisSpeedSupplier, PIDController drivePIDController) {
         robotPose = drivetrain::getEstimatedPosition;
+        this.chassisSpeedSupplier = chassisSpeedSupplier;
+        this.drivePIDController = drivePIDController;
         addRequirements(drivetrain);
     }
 
@@ -38,8 +48,6 @@ public class DriveToPoseCommand extends Command {
 
     }
 
-
-    private TrapezoidProfile.State lastState;
     /**
      * The initial subroutine of a command.  Called once when the command is initially scheduled.
      */
@@ -49,16 +57,76 @@ public class DriveToPoseCommand extends Command {
                         DrivetrainConstants.DriveToPose.AUTO_CONSTRAINTS :
                         DrivetrainConstants.DriveToPose.TELE_CONSTRAINTS);
 
-        var errorVector = robotPose.get().getTranslation().minus(targetPose.get().getTranslation())
+        var errorVector = robotPose.get().getTranslation().minus(goalPose.get().getTranslation()).toVector();
         //velocityVector*errorVector/velocityVector
+        var speeds = ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeedSupplier.get(), robotPose.get().getRotation());
+        double startVelocityScalar = errorVector.dot(
+                VecBuilder.fill(speeds.vxMetersPerSecond,  speeds.vyMetersPerSecond))
+                /errorVector.norm();
+        lastState = new  TrapezoidProfile.State(errorVector.norm(), -startVelocityScalar);
     }
 
     /**
-     * The main body of a command.  Called repeatedly while the command is scheduled.
-     * (That is, it is called repeatedly until {@link #isFinished()}) returns true.)
+     * calculates the next state in the profile.
+     * @param goal final goal
+     * @param pose current pose
+     * @param error the distance between the current pose and the goal.
+     * @return the next state of the profile
      */
+    public TrapezoidProfile.State calcProfile(Pose2d goal, Pose2d pose, double error) {
+        var profileDirection = goal.getTranslation().minus(lastSetPoint).toVector();
+
+        //if the distance from the current pose to the goal is less then a content then we will not scale the velocity
+        //vector according to the direction vector.
+        double velocity = profileDirection.norm()
+                <= DrivetrainConstants.DriveToPose.MIN_DISTANCE_VELOCITY_CORRECTION
+                ? lastSetpointVelocity.norm()
+                : lastSetpointVelocity.dot(profileDirection) / profileDirection.norm();
+
+        velocity = Math.max(velocity, DrivetrainConstants.DriveToPose.MIN_SET_POINT_VELOCITY);
+
+        TrapezoidProfile.State currentState = new TrapezoidProfile.State(profileDirection.norm(), -velocity);
+
+        var nextState = driveProfile.calculate(0.02, currentState, GOAL_STATE);
+
+        double scalar = nextState.position / error;
+
+        //let v be current pose vector
+        //let u be goal pose vector
+        //vectoric function:
+        //w = v * t + u * (1 - t)
+        lastSetPoint = pose.getTranslation().times(scalar).plus(goal.getTranslation().times(1 - scalar));
+
+        return nextState;
+    }
+
+    private final static double FF_MIN_DISTANCE = DrivetrainConstants.DriveToPose.FF_MIN_DISTANCE;
+    private final static double FF_MAX_DISTANCE = DrivetrainConstants.DriveToPose.FF_MAX_DISTANCE;
+
+    /**
+     * calc the FFScalar for the velocity
+     * @param error the distance between the current pose and the goal.
+     * @return how much should the velocity FF affect the output.
+     */
+    public double FFScalar(double error){
+        return MathUtil.clamp((error - FF_MIN_DISTANCE)/ (FF_MAX_DISTANCE - FF_MIN_DISTANCE),
+                0.0, 1.0);
+    }
+
     @Override
     public void execute() {
+        Pose2d pose = robotPose.get();
+        Pose2d goal = goalPose.get();
+        var poseError = pose.relativeTo(goal);
+        double absError = poseError.getTranslation().getNorm();
+        var nextState = calcProfile(goal, pose, absError);
+
+        //
+        double targetVelocity = drivePIDController.calculate(absError, nextState.position)
+                + nextState.velocity * FFScalar(absError);
+
+
+
 
     }
 
