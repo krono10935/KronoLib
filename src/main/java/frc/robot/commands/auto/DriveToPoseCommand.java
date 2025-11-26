@@ -14,6 +14,8 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import frc.robot.subsystems.drivetrain.DrivetrainConstants;
+import org.littletonrobotics.junction.Logger;
+
 import java.util.function.Supplier;
 
 public class DriveToPoseCommand extends Command {
@@ -87,6 +89,8 @@ public class DriveToPoseCommand extends Command {
                 angularGains.getK_D(),
                 DrivetrainConstants.DriveToPose.ANGLE_AUTO_CONSTRAINTS);
 
+        angularPIDController.enableContinuousInput(-Math.PI, Math.PI);
+
         addRequirements(drivetrain);
     }
 
@@ -132,8 +136,9 @@ public class DriveToPoseCommand extends Command {
      * @return the next state of the profile
      */
     public TrapezoidProfile.State calcProfile(Pose2d goal, Pose2d pose, double error) {
-        var profileDirection = goal.getTranslation().minus(lastSetPoint).toVector();
-
+        var profileDirection2d = goal.getTranslation().minus(lastSetPoint);
+        var profileDirection = profileDirection2d.toVector();
+        Logger.recordOutput("stupid", profileDirection2d);
         //if the distance from the current pose to the goal is less then a constant then we will not scale the velocity
         //vector according to the direction vector.
         double velocity = profileDirection.norm()
@@ -154,7 +159,8 @@ public class DriveToPoseCommand extends Command {
         //vectoric function:
         //w = v * t + u * (1 - t)
         lastSetPoint = pose.getTranslation().times(scalar).plus(goal.getTranslation().times(1 - scalar));
-
+        Logger.recordOutput("next state pos", nextState.position);
+        Logger.recordOutput("next state vol", nextState.velocity);
         return nextState;
     }
 
@@ -197,6 +203,7 @@ public class DriveToPoseCommand extends Command {
                 pose.getRotation());
 
         drivetrain.drive(speeds);
+        Logger.recordOutput("desiredAutoSpeeds", speeds);
     }
 
     @Override
