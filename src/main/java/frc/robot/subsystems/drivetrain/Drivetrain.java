@@ -76,8 +76,12 @@ public abstract class Drivetrain extends SubsystemBase {
                 this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 (speeds, feedforwards) -> drive(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
                 new PPController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                        new PIDConstants(2, 0.0, 0.0), // Translation PID constants
-                        new PIDConstants(2, 0.0, 0.0) // Rotation PID constants
+                        new PIDConstants(DrivetrainConstants.DriveToPose.LINEAR_PID_GAINS.getK_P(),
+                                DrivetrainConstants.DriveToPose.LINEAR_PID_GAINS.getK_I() ,
+                                DrivetrainConstants.DriveToPose.LINEAR_PID_GAINS.getK_D()), // Translation PID constants
+                        new PIDConstants(DrivetrainConstants.DriveToPose.ANGULAR_PID_GAINS.getK_P(),
+                                DrivetrainConstants.DriveToPose.ANGULAR_PID_GAINS.getK_I() ,
+                                DrivetrainConstants.DriveToPose.ANGULAR_PID_GAINS.getK_D()) // Rotation PID constants
                 ),
                 config, // The robot configuration
                 DrivetrainConstants::shouldFlipPath,

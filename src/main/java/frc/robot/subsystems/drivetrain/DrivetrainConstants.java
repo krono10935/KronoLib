@@ -27,30 +27,30 @@ public class DrivetrainConstants {
          * the linear Trapezoid Profile constraints for autonomous
          */
         public static final TrapezoidProfile.Constraints LINEAR_AUTO_CONSTRAINTS =
-                new TrapezoidProfile.Constraints(0, 0);
+                new TrapezoidProfile.Constraints(4, 1);
         /**
          * the linear Trapezoid Profile constraints for tele-op
          */
         public static final TrapezoidProfile.Constraints LINEAR_TELE_CONSTRAINTS =
-                new TrapezoidProfile.Constraints(0, 0);
+                new TrapezoidProfile.Constraints(4, 1);
         /**
          * the angle Trapezoid Profile constraints for autonomous
          */
         public static final TrapezoidProfile.Constraints ANGLE_AUTO_CONSTRAINTS =
-                new TrapezoidProfile.Constraints(Units.degreesToRadians(0), Units.degreesToRadians(0));
+                new TrapezoidProfile.Constraints(Units.degreesToRadians(MAX_LINEAR_SPEED), Units.degreesToRadians(180));
         /**
          * the angle Trapezoid Profile constraints for tele-op
          */
         public static final TrapezoidProfile.Constraints ANGLE_TELE_CONSTRAINTS =
-                new TrapezoidProfile.Constraints(Units.degreesToRadians(0), Units.degreesToRadians(0));
+                new TrapezoidProfile.Constraints(Units.degreesToRadians(MAX_ANGULAR_SPEED), Units.degreesToRadians(180));
         /**
          * linear PID constants
          */
-        public static final PIDGains LINEAR_PID_GAINS = new PIDGains();
+        public static final PIDGains LINEAR_PID_GAINS = new PIDGains(3,0.2,0);
         /**
          * angular PID constants
          */
-        public static final PIDGains ANGULAR_PID_GAINS = new PIDGains();
+        public static final PIDGains ANGULAR_PID_GAINS = new PIDGains(1,0,0);
         /**
          * the minimum distance from the current pose to the goal where we will not scale the velocity
          */
@@ -78,11 +78,11 @@ public class DrivetrainConstants {
         /**
          * the distance within the robot is considered at the goal
          */
-        public static final double poseTolerance = 5;
+        public static final double poseTolerance = 0.01;
         /**
          * the angle within the robot is considered at the goal
          */
-        public static final double angleTolerance = 10;
+        public static final double angleTolerance = Units.degreesToRadians(5);
     }
 
     public static boolean shouldFlipPath(){
