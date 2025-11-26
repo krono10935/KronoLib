@@ -1,8 +1,8 @@
 package frc.robot.commands.auto;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -14,56 +14,114 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import frc.robot.subsystems.drivetrain.DrivetrainConstants;
-import io.github.captainsoccer.basicmotor.LogFrame;
-
 import java.util.function.Supplier;
 
-
 public class DriveToPoseCommand extends Command {
-    private Drivetrain drivetrain;
-    private Supplier<Pose2d> goalPose;
-    private final Supplier<Pose2d> robotPose;
-    private TrapezoidProfile driveProfile;
-    private final Supplier<ChassisSpeeds> chassisSpeedSupplier;
-    private TrapezoidProfile.State lastState;
-    private Translation2d lastSetPoint;
-    private Vector<N2> lastSetpointVelocity;
+    /**
+     * the goal state in the Trapezoid Profile
+     */
     private final static TrapezoidProfile.State GOAL_STATE = new State(0,0);
+    /**
+     * the drivetrain of the robot
+     */
+    private final Drivetrain drivetrain;
+    /**
+     * the position of the goal
+     */
+    private final Supplier<Pose2d> goalPose;
+    /**
+     * the position of the robot
+     */
+    private final Supplier<Pose2d> robotPose;
+    /**
+     * the linear Trapezoid Profile
+     */
+    private TrapezoidProfile driveProfile;
+    /**
+     * the chassis speed
+     */
+    private final Supplier<ChassisSpeeds> chassisSpeedSupplier;
+    /**
+     * the position in the last run
+     */
+    private Translation2d lastSetPoint;
+    /**
+     * the velocity in the last run
+     */
+    private Vector<N2> lastSetpointVelocity;
+    /**
+     * the linear PID controller
+     */
     private final PIDController drivePIDController;
+    /**
+     * the angular PID controller and profile
+     */
+    private final ProfiledPIDController angularPIDController;
+    /**
+     * absolute value of the angle error
+     */
+    private double absAngleError;
+    /**
+     * absolute value of the linear error
+     */
+    private double absPoseError;
 
 
-    public DriveToPoseCommand(Drivetrain drivetrain, Supplier<Pose2d> targetPose, Supplier<ChassisSpeeds> chassisSpeedSupplier, PIDController drivePIDController) {
+    public DriveToPoseCommand(Drivetrain drivetrain, Supplier<Pose2d> goalPose) {
         robotPose = drivetrain::getEstimatedPosition;
-        this.chassisSpeedSupplier = chassisSpeedSupplier;
-        this.drivePIDController = drivePIDController;
+        this.chassisSpeedSupplier = drivetrain::getChassisSpeeds;
+        this.drivetrain = drivetrain;
+        this.goalPose = goalPose;
+
+        var linerGains = DrivetrainConstants.DriveToPose.LINEAR_PID_GAINS;
+        drivePIDController = new PIDController(
+                linerGains.getK_P(),
+                linerGains.getK_I(),
+                linerGains.getK_D()
+        );
+
+        var angularGains = DrivetrainConstants.DriveToPose.ANGULAR_PID_GAINS;
+        angularPIDController = new ProfiledPIDController(
+                angularGains.getK_P(),
+                angularGains.getK_I(),
+                angularGains.getK_D(),
+                DrivetrainConstants.DriveToPose.ANGLE_AUTO_CONSTRAINTS);
+
         addRequirements(drivetrain);
     }
 
-    public ChassisSpeeds getChassisSpeeds() {
+    /**
+     * rests all the variables before starting
+     */
+    private void resetState(){
+        driveProfile = new TrapezoidProfile(RobotState.isAutonomous() ?
+                DrivetrainConstants.DriveToPose.LINEAR_AUTO_CONSTRAINTS :
+                DrivetrainConstants.DriveToPose.LINEAR_TELE_CONSTRAINTS);
 
+        drivePIDController.reset();
+
+        angularPIDController.setConstraints(RobotState.isAutonomous() ?
+                DrivetrainConstants.DriveToPose.ANGLE_AUTO_CONSTRAINTS:
+                DrivetrainConstants.DriveToPose.ANGLE_TELE_CONSTRAINTS);
+
+        var speeds = ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeedSupplier.get(), robotPose.get().getRotation());
+
+        angularPIDController.reset(new State(robotPose.get().getRotation().getRadians(), speeds.omegaRadiansPerSecond));
+
+        lastSetPoint = robotPose.get().getTranslation();
+
+        lastSetpointVelocity = VecBuilder.fill(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
+
+        absAngleError = robotPose.get().relativeTo(goalPose.get()).getRotation().getRadians();
+
+        absPoseError = robotPose.get().relativeTo(goalPose.get()).getTranslation().getNorm();
     }
-
-
-    public LogFrame.PIDOutput getPIDOutput() {
-
-    }
-
     /**
      * The initial subroutine of a command.  Called once when the command is initially scheduled.
      */
     @Override
     public void initialize() {
-        driveProfile = new TrapezoidProfile(RobotState.isAutonomous() ?
-                        DrivetrainConstants.DriveToPose.AUTO_CONSTRAINTS :
-                        DrivetrainConstants.DriveToPose.TELE_CONSTRAINTS);
-
-        var errorVector = robotPose.get().getTranslation().minus(goalPose.get().getTranslation()).toVector();
-        //velocityVector*errorVector/velocityVector
-        var speeds = ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeedSupplier.get(), robotPose.get().getRotation());
-        double startVelocityScalar = errorVector.dot(
-                VecBuilder.fill(speeds.vxMetersPerSecond,  speeds.vyMetersPerSecond))
-                /errorVector.norm();
-        lastState = new  TrapezoidProfile.State(errorVector.norm(), -startVelocityScalar);
+        resetState();
     }
 
     /**
@@ -76,7 +134,7 @@ public class DriveToPoseCommand extends Command {
     public TrapezoidProfile.State calcProfile(Pose2d goal, Pose2d pose, double error) {
         var profileDirection = goal.getTranslation().minus(lastSetPoint).toVector();
 
-        //if the distance from the current pose to the goal is less then a content then we will not scale the velocity
+        //if the distance from the current pose to the goal is less then a constant then we will not scale the velocity
         //vector according to the direction vector.
         double velocity = profileDirection.norm()
                 <= DrivetrainConstants.DriveToPose.MIN_DISTANCE_VELOCITY_CORRECTION
@@ -100,16 +158,13 @@ public class DriveToPoseCommand extends Command {
         return nextState;
     }
 
-    private final static double FF_MIN_DISTANCE = DrivetrainConstants.DriveToPose.FF_MIN_DISTANCE;
-    private final static double FF_MAX_DISTANCE = DrivetrainConstants.DriveToPose.FF_MAX_DISTANCE;
-
     /**
      * calc the FFScalar for the velocity
      * @param error the distance between the current pose and the goal.
      * @return how much should the velocity FF affect the output.
      */
-    public double FFScalar(double error){
-        return MathUtil.clamp((error - FF_MIN_DISTANCE)/ (FF_MAX_DISTANCE - FF_MIN_DISTANCE),
+    public double FFScalar(double error, double minError, double maxError) {
+        return MathUtil.clamp((error - minError)/ (maxError - minError),
                 0.0, 1.0);
     }
 
@@ -118,49 +173,40 @@ public class DriveToPoseCommand extends Command {
         Pose2d pose = robotPose.get();
         Pose2d goal = goalPose.get();
         var poseError = pose.relativeTo(goal);
-        double absError = poseError.getTranslation().getNorm();
-        var nextState = calcProfile(goal, pose, absError);
+        double absPoseError = poseError.getTranslation().getNorm();
+        double angleError = poseError.getRotation().getRadians();
+        var nextState = calcProfile(goal, pose, absPoseError);
 
-        //
-        double targetVelocity = drivePIDController.calculate(absError, nextState.position)
-                + nextState.velocity * FFScalar(absError);
+        double targetVelocity = drivePIDController.calculate(absPoseError, nextState.position)
+                + nextState.velocity * FFScalar(absPoseError, DrivetrainConstants.DriveToPose.FF_MIN_DISTANCE,
+                DrivetrainConstants.DriveToPose.FF_MAX_DISTANCE);
 
+        var errorAngle = robotPose.get().getTranslation().minus(goalPose.get().getTranslation()).getAngle();
 
+        var driveVelocity = new Translation2d(targetVelocity, errorAngle);
 
+        lastSetpointVelocity = driveVelocity.toVector();
 
+        double angularVelocity = angularPIDController.calculate(pose.getRotation().getRadians(),
+                goal.getRotation().getRadians());
+
+        angularVelocity += angularPIDController.getSetpoint().velocity * FFScalar(Math.abs(angleError),
+                DrivetrainConstants.DriveToPose.FF_MIN_ANGLE, DrivetrainConstants.DriveToPose.FF_MAX_ANGLE);
+
+        var speeds = ChassisSpeeds.fromFieldRelativeSpeeds(driveVelocity.getX(), driveVelocity.getY(), angularVelocity,
+                pose.getRotation());
+
+        drivetrain.drive(speeds);
     }
 
-    /**
-     * <p>
-     * Returns whether this command has finished. Once a command finishes -- indicated by
-     * this method returning true -- the scheduler will call its {@link #end(boolean)} method.
-     * </p><p>
-     * Returning false will result in the command never ending automatically. It may still be
-     * cancelled manually or interrupted by another command. Hard coding this command to always
-     * return true will result in the command executing once and finishing immediately. It is
-     * recommended to use * {@link edu.wpi.first.wpilibj2.command.InstantCommand InstantCommand}
-     * for such an operation.
-     * </p>
-     *
-     * @return whether this command has finished.
-     *
-     */
     @Override
     public boolean isFinished() {
-
-        return false;
+        return absAngleError <= DrivetrainConstants.DriveToPose.angleTolerance
+                && absPoseError <= DrivetrainConstants.DriveToPose.poseTolerance;
     }
 
-    /**
-     * The action to take when the command ends. Called when either the command
-     * finishes normally -- that is it is called when {@link #isFinished()} returns
-     * true -- or when  it is interrupted/canceled. This is where you may want to
-     * wrap up loose ends, like shutting off a motor that was being used in the command.
-     *
-     * @param interrupted whether the command was interrupted/canceled
-     */
     @Override
     public void end(boolean interrupted) {
-
+        drivetrain.drive(new ChassisSpeeds());
     }
 }
