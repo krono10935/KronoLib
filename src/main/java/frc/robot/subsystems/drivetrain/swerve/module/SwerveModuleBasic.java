@@ -92,9 +92,10 @@ public class SwerveModuleBasic extends SwerveModuleIO {
     @Override
     public void update(){
         super.update();
-        if (canCoder != null)
+        if (canCoder != null){
             Logger.recordOutput("basic module/" + constants.name() + "/magnet health",
                     canCoder.getMagnetHealth().toString());
             Logger.recordOutput("basic module/" + constants.name() + "/cancoder pos", canCoder.getAbsolutePosition().getValueAsDouble()  );
+        }
     }
 }
