@@ -37,16 +37,16 @@ public class DrivetrainConstants {
          * the angle Trapezoid Profile constraints for autonomous
          */
         public static final TrapezoidProfile.Constraints ANGLE_AUTO_CONSTRAINTS =
-                new TrapezoidProfile.Constraints(Units.degreesToRadians(MAX_LINEAR_SPEED), Units.degreesToRadians(180));
+                new TrapezoidProfile.Constraints(MAX_ANGULAR_SPEED/2, Units.degreesToRadians(45));
         /**
          * the angle Trapezoid Profile constraints for tele-op
          */
         public static final TrapezoidProfile.Constraints ANGLE_TELE_CONSTRAINTS =
-                new TrapezoidProfile.Constraints(Units.degreesToRadians(MAX_ANGULAR_SPEED), Units.degreesToRadians(180));
+                new TrapezoidProfile.Constraints(MAX_ANGULAR_SPEED/2, Units.degreesToRadians(45));
         /**
          * linear PID constants
          */
-        public static final PIDGains LINEAR_PID_GAINS = new PIDGains(3,0.2,0);
+        public static final PIDGains LINEAR_PID_GAINS = new PIDGains(1.5,0.002,0);
         /**
          * angular PID constants
          */
