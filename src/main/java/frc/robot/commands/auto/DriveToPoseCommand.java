@@ -142,7 +142,7 @@ public class DriveToPoseCommand extends Command {
     public TrapezoidProfile.State calcProfile(Pose2d goal, Pose2d pose, double error) {
         var profileDirection2d = goal.getTranslation().minus(lastSetPoint);
         var profileDirection = profileDirection2d.toVector();
-        Logger.recordOutput("stupid", profileDirection2d);
+        Logger.recordOutput("stupid", profileDirection2d.getAngle());
         //if the distance from the current pose to the goal is less then a constant then we will not scale the velocity
         //vector according to the direction vector.
         double velocity = profileDirection.norm()

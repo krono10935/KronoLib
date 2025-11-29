@@ -19,8 +19,8 @@ public class DrivetrainConstants {
 
     public static final double MAX_LINEAR_SPEED = 4; // TODO find max linear speed (m/s)
     public static final double MIN_LINEAR_SPEED = 0.5; // m/s
-    public static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / SwerveModuleConstants.FRONT_LEFT.TRANSLATION.getNorm(); // degrees/s
-    public static final double MIN_ANGULAR_SPEED = MIN_LINEAR_SPEED / SwerveModuleConstants.FRONT_LEFT.TRANSLATION.getNorm(); // degrees/s
+    public static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / SwerveModuleConstants.FRONT_LEFT.TRANSLATION.getNorm(); // rad/s
+    public static final double MIN_ANGULAR_SPEED = MIN_LINEAR_SPEED / SwerveModuleConstants.FRONT_LEFT.TRANSLATION.getNorm(); // rad/s
 
     public static class DriveToPose{
         /**
