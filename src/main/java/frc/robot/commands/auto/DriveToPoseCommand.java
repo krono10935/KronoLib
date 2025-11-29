@@ -187,12 +187,18 @@ public class DriveToPoseCommand extends Command {
         absAngleError = Math.abs(poseError.getRotation().getRadians());
         var nextState = calcProfile(goal, pose, absPoseError);
 
-        double targetVelocity = drivePIDController.calculate(absPoseError, nextState.position)
-                + nextState.velocity * FFScalar(absPoseError, DrivetrainConstants.DriveToPose.FF_MIN_DISTANCE,
+        double targetVelocityPID = drivePIDController.calculate(absPoseError, nextState.position);
+
+        double targetVelocityFF = nextState.velocity * FFScalar(absPoseError, DrivetrainConstants.DriveToPose.FF_MIN_DISTANCE,
                 DrivetrainConstants.DriveToPose.FF_MAX_DISTANCE);
 
         var errorAngle = pose.getTranslation().minus(goal.getTranslation()).getAngle();
         Logger.recordOutput("errorAngle", errorAngle);
+
+        lastSetpointVelocity = new Translation2d(targetVelocityFF, errorAngle).toVector();
+
+        double targetVelocity = targetVelocityPID + targetVelocityFF;
+
 
         if(absPoseError <= DrivetrainConstants.DriveToPose.POSE_TOLERANCE)
             targetVelocity = 0;
@@ -202,7 +208,7 @@ public class DriveToPoseCommand extends Command {
 
         var driveVelocity = new Translation2d(targetVelocity, errorAngle);
 
-        lastSetpointVelocity = driveVelocity.toVector();
+//        lastSetpointVelocity = driveVelocity.toVector();
 
         double angularVelocity = angularPIDController.calculate(pose.getRotation().getRadians(),
                 goal.getRotation().getRadians());
