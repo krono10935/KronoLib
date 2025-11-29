@@ -228,8 +228,13 @@ public class DriveToPoseCommand extends Command {
 
     @Override
     public boolean isFinished() {
+        var speeds = chassisSpeedSupplier.get();
+        double linearSpeed = Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
+        double angularSpeed = Math.abs(speeds.omegaRadiansPerSecond);
         return absAngleError <= DrivetrainConstants.DriveToPose.ANGLE_TOLERANCE
-                && absPoseError <= DrivetrainConstants.DriveToPose.POSE_TOLERANCE;
+                && absPoseError <= DrivetrainConstants.DriveToPose.POSE_TOLERANCE
+                && linearSpeed <= DrivetrainConstants.DriveToPose.VELOCITY_TOLERANCE
+                && angularSpeed <= DrivetrainConstants.DriveToPose.ANGULAR_VELOCITY_TOLERANCE;
     }
 
     @Override

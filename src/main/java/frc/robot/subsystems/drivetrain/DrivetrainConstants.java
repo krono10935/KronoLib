@@ -82,7 +82,17 @@ public class DrivetrainConstants {
         /**
          * the angle within the robot is considered at the goal
          */
-        public static final double ANGLE_TOLERANCE = Units.degreesToRadians(5);
+        public static final double ANGLE_TOLERANCE = Units.degreesToRadians(2);
+        /**
+         * the velocity below the robot is considered stopped. if above the velocity the robot will not be considered
+         * inside the tolerance.
+         */
+        public static final double VELOCITY_TOLERANCE = 0.1; //m/s
+        /**
+         * the angular velocity below the robot is considered stopped. if above the angular velocity the robot will not
+         * be considered inside the tolerance.
+         */
+        public static final double ANGULAR_VELOCITY_TOLERANCE =  Units.degreesToRadians(5); //rad/s
     }
 
     public static boolean shouldFlipPath(){
