@@ -4,6 +4,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.Vector;
@@ -116,9 +117,11 @@ public class DriveToPoseCommand extends Command {
 
         lastSetpointVelocity = VecBuilder.fill(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
 
-        absAngleError = robotPose.get().relativeTo(goalPose.get()).getRotation().getRadians();
+        var error = robotPose.get().relativeTo(goalPose.get());
 
-        absPoseError = robotPose.get().relativeTo(goalPose.get()).getTranslation().getNorm();
+        absAngleError = Math.abs(error.getRotation().getRadians());
+
+        absPoseError = error.getTranslation().getNorm();
     }
     /**
      * The initial subroutine of a command.  Called once when the command is initially scheduled.
@@ -126,6 +129,7 @@ public class DriveToPoseCommand extends Command {
     @Override
     public void initialize() {
         resetState();
+        Logger.recordOutput("driveToPose/goalPose", goalPose.get());
     }
 
     /**
@@ -179,15 +183,22 @@ public class DriveToPoseCommand extends Command {
         Pose2d pose = robotPose.get();
         Pose2d goal = goalPose.get();
         var poseError = pose.relativeTo(goal);
-        double absPoseError = poseError.getTranslation().getNorm();
-        double angleError = poseError.getRotation().getRadians();
+        absPoseError = poseError.getTranslation().getNorm();
+        absAngleError = Math.abs(poseError.getRotation().getRadians());
         var nextState = calcProfile(goal, pose, absPoseError);
 
         double targetVelocity = drivePIDController.calculate(absPoseError, nextState.position)
                 + nextState.velocity * FFScalar(absPoseError, DrivetrainConstants.DriveToPose.FF_MIN_DISTANCE,
                 DrivetrainConstants.DriveToPose.FF_MAX_DISTANCE);
 
-        var errorAngle = robotPose.get().getTranslation().minus(goalPose.get().getTranslation()).getAngle();
+        var errorAngle = pose.getTranslation().minus(goal.getTranslation()).getAngle();
+        Logger.recordOutput("errorAngle", errorAngle);
+
+        if(absPoseError <= DrivetrainConstants.DriveToPose.POSE_TOLERANCE)
+            targetVelocity = 0;
+
+        targetVelocity = Math.signum(targetVelocity) * Math.min(Math.abs(targetVelocity),
+                DrivetrainConstants.MAX_LINEAR_SPEED);
 
         var driveVelocity = new Translation2d(targetVelocity, errorAngle);
 
@@ -196,20 +207,29 @@ public class DriveToPoseCommand extends Command {
         double angularVelocity = angularPIDController.calculate(pose.getRotation().getRadians(),
                 goal.getRotation().getRadians());
 
-        angularVelocity += angularPIDController.getSetpoint().velocity * FFScalar(Math.abs(angleError),
+        angularVelocity += angularPIDController.getSetpoint().velocity * FFScalar(absAngleError,
                 DrivetrainConstants.DriveToPose.FF_MIN_ANGLE, DrivetrainConstants.DriveToPose.FF_MAX_ANGLE);
+
+
+        if(absAngleError <= DrivetrainConstants.DriveToPose.ANGLE_TOLERANCE)
+            angularVelocity = 0;
 
         var speeds = ChassisSpeeds.fromFieldRelativeSpeeds(driveVelocity.getX(), driveVelocity.getY(), angularVelocity,
                 pose.getRotation());
 
         drivetrain.drive(speeds);
         Logger.recordOutput("desiredAutoSpeeds", speeds);
+        Logger.recordOutput("driveToPose/lastSetPoint", new Pose2d(lastSetPoint,
+                Rotation2d.fromRadians(angularPIDController.getSetpoint().position)));
+        Logger.recordOutput("driveToPose/profile/position", nextState.position);
+        Logger.recordOutput("driveToPose/profile/velocity", nextState.velocity);
+
     }
 
     @Override
     public boolean isFinished() {
-        return absAngleError <= DrivetrainConstants.DriveToPose.angleTolerance
-                && absPoseError <= DrivetrainConstants.DriveToPose.poseTolerance;
+        return absAngleError <= DrivetrainConstants.DriveToPose.ANGLE_TOLERANCE
+                && absPoseError <= DrivetrainConstants.DriveToPose.POSE_TOLERANCE;
     }
 
     @Override

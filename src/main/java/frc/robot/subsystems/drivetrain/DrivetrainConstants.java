@@ -78,11 +78,11 @@ public class DrivetrainConstants {
         /**
          * the distance within the robot is considered at the goal
          */
-        public static final double poseTolerance = 0.01;
+        public static final double POSE_TOLERANCE = 0.01;
         /**
          * the angle within the robot is considered at the goal
          */
-        public static final double angleTolerance = Units.degreesToRadians(5);
+        public static final double ANGLE_TOLERANCE = Units.degreesToRadians(5);
     }
 
     public static boolean shouldFlipPath(){
