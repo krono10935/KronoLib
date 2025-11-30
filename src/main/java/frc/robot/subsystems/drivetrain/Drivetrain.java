@@ -11,11 +11,10 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.PPController;
+// import frc.robot.PPController;
 import frc.robot.subsystems.drivetrain.gyro.GyroIO;
 import frc.robot.subsystems.drivetrain.gyro.GyroIONavx;
 import frc.robot.subsystems.drivetrain.gyro.GyroIOSim;
-import frc.robot.subsystems.drivetrain.DrivetrainInputsAutoLogged;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -26,14 +25,11 @@ import org.littletonrobotics.junction.Logger;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 public abstract class Drivetrain extends SubsystemBase {
@@ -75,7 +71,7 @@ public abstract class Drivetrain extends SubsystemBase {
                 this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
                 this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 (speeds, feedforwards) -> drive(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
-                new PPController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+                new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
                         new PIDConstants(DrivetrainConstants.DriveToPose.LINEAR_PID_GAINS.getK_P(),
                                 DrivetrainConstants.DriveToPose.LINEAR_PID_GAINS.getK_I() ,
                                 DrivetrainConstants.DriveToPose.LINEAR_PID_GAINS.getK_D()), // Translation PID constants

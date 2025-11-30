@@ -23,7 +23,6 @@ import frc.robot.subsystems.drivetrain.DrivetrainConstants;
 import frc.robot.subsystems.drivetrain.swerve.module.SwerveModuleBasic;
 import frc.robot.subsystems.drivetrain.swerve.module.SwerveModuleConstants;
 import frc.robot.subsystems.drivetrain.swerve.module.SwerveModuleIO;
-import frc.robot.subsystems.drivetrain.swerve.SwerveInputsAutoLogged;
 
 public class Swerve extends Drivetrain {
     
@@ -71,6 +70,9 @@ public class Swerve extends Drivetrain {
     @Override
     protected void setChassisSpeed(ChassisSpeeds speeds) {
         var targetSpeeds = kinematics.toWheelSpeeds(speeds);
+
+        SwerveDriveKinematics.desaturateWheelSpeeds(targetSpeeds, DrivetrainConstants.MAX_LINEAR_SPEED);
+        
         for (int i = 0; i < 4; i++){
             //
             targetSpeeds[i].optimize(io[i].getState().angle);
