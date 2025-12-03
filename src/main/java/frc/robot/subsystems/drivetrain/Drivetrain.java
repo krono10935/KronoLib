@@ -11,10 +11,12 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 // import frc.robot.PPController;
 import frc.robot.subsystems.drivetrain.gyro.GyroIO;
 import frc.robot.subsystems.drivetrain.gyro.GyroIONavx;
 import frc.robot.subsystems.drivetrain.gyro.GyroIOSim;
+import frc.robot.subsystems.drivetrain.swerve.module.SwerveModuleIO;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -66,38 +68,38 @@ public abstract class Drivetrain extends SubsystemBase {
         }
 
         // Configure AutoBuilder last
-        AutoBuilder.configure(
-                this::getEstimatedPosition, // Robot pose supplier
-                this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
-                this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-                (speeds, feedforwards) -> drive(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
-                new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                        new PIDConstants(DrivetrainConstants.DriveToPose.LINEAR_PID_GAINS.getK_P(),
-                                DrivetrainConstants.DriveToPose.LINEAR_PID_GAINS.getK_I() ,
-                                DrivetrainConstants.DriveToPose.LINEAR_PID_GAINS.getK_D()), // Translation PID constants
-                        new PIDConstants(DrivetrainConstants.DriveToPose.ANGULAR_PID_GAINS.getK_P(),
-                                DrivetrainConstants.DriveToPose.ANGULAR_PID_GAINS.getK_I() ,
-                                DrivetrainConstants.DriveToPose.ANGULAR_PID_GAINS.getK_D()) // Rotation PID constants
-                ),
-                config, // The robot configuration
-                DrivetrainConstants::shouldFlipPath,
-                this // Reference to this subsystem to set requirements
-    );
+    //     AutoBuilder.configure(
+    //             this::getEstimatedPosition, // Robot pose supplier
+    //             this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
+    //             this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+    //             (speeds, feedforwards) -> drive(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+    //             new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+    //                     new PIDConstants(DrivetrainConstants.DriveToPose.LINEAR_PID_GAINS.getK_P(),
+    //                             DrivetrainConstants.DriveToPose.LINEAR_PID_GAINS.getK_I() ,
+    //                             DrivetrainConstants.DriveToPose.LINEAR_PID_GAINS.getK_D()), // Translation PID constants
+    //                     new PIDConstants(DrivetrainConstants.DriveToPose.ANGULAR_PID_GAINS.getK_P(),
+    //                             DrivetrainConstants.DriveToPose.ANGULAR_PID_GAINS.getK_I() ,
+    //                             DrivetrainConstants.DriveToPose.ANGULAR_PID_GAINS.getK_D()) // Rotation PID constants
+    //             ),
+    //             config, // The robot configuration
+    //             DrivetrainConstants::shouldFlipPath,
+    //             this // Reference to this subsystem to set requirements
+    // );
 
-        PathPlannerLogging.setLogActivePathCallback(
-                (poses) -> {
-                    var posesArr = poses.toArray(new Pose2d[0]);
+    //     PathPlannerLogging.setLogActivePathCallback(
+    //             (poses) -> {
+    //                 var posesArr = poses.toArray(new Pose2d[0]);
 
-                    Logger.recordOutput("DriveTrain/PathPlanner/active path", posesArr);
-                }
-        );
+    //                 Logger.recordOutput("DriveTrain/PathPlanner/active path", posesArr);
+    //             }
+    //     );
 
-        PathPlannerLogging.setLogTargetPoseCallback(
-                (pose) -> {
-                    Logger.recordOutput("DriveTrain/PathPlanner/target pose", pose);
-                    this.pathPlannerTargetPose = pose;
-                }
-        );
+    //     PathPlannerLogging.setLogTargetPoseCallback(
+    //             (pose) -> {
+    //                 Logger.recordOutput("DriveTrain/PathPlanner/target pose", pose);
+    //                 this.pathPlannerTargetPose = pose;
+    //             }
+    //     );
     }
 
     /**
@@ -210,5 +212,13 @@ public abstract class Drivetrain extends SubsystemBase {
                 0.1* DrivetrainConstants.MAX_LINEAR_SPEED, 0.1* DrivetrainConstants.MAX_LINEAR_SPEED, 0)) , this).
         withTimeout(0.5);
     }
+    
+    public abstract void usePowerAndAngle(double voltage, Rotation2d angle);
+
+    public abstract void spinWithPower(double voltage);
+
+    public abstract void setDriveVoltage(double voltage);
+
+    public abstract void setSteerVoltage(double voltage);
 }
 

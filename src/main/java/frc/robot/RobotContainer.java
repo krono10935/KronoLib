@@ -5,20 +5,54 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.commands.DriveCommand;
+import frc.robot.commands.SwerveSysID;
+import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.drivetrain.swerve.Swerve;
 
 
 
 public class RobotContainer
 {
+    private static Drivetrain drivetrain;
+    private static CommandXboxController controller;
+    private static SwerveSysID swerveSysID;
     public RobotContainer()
     {
+        controller = new CommandXboxController(0);
+        drivetrain = new Swerve(()->false);
+        swerveSysID = new SwerveSysID(drivetrain, controller);
         configureBindings();
+        drivetrain.reset(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
     }
     
     
-    private void configureBindings() {}
+    private void configureBindings() {
+        controller.a().whileTrue(
+            swerveSysID.sysIdQuasistaticDrive(Direction.kForward)
+        );
+
+        controller.b().whileTrue(
+            swerveSysID.sysIdQuasistaticDrive(Direction.kReverse)
+        );
+
+        controller.y().whileTrue(
+            swerveSysID.sysIdDynamicDrive(Direction.kForward)
+        );
+
+        controller.x().whileTrue(
+            swerveSysID.sysIdDynamicDrive(Direction.kReverse)
+        );
+
+        drivetrain.setDefaultCommand(swerveSysID.sysIdDynamicSteer(Direction.kForward));
+    }
     
     
     public Command getAutonomousCommand()

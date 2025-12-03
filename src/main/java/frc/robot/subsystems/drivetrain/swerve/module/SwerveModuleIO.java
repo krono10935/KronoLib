@@ -22,6 +22,8 @@ public abstract class SwerveModuleIO {
      */
     public abstract void setTargetState(SwerveModuleState targetState);
 
+    public abstract void setTargetStateVoltages(SwerveModuleState targetState);
+
     public SwerveModuleState getState(){
         return currentState;
     }
@@ -62,4 +64,10 @@ public abstract class SwerveModuleIO {
      */
     public abstract void setBrakeMode(boolean isBrake);
 
+
+    public abstract void setDriveVoltage(double voltage);
+  
+    public abstract void setSteerVoltage(double voltage);
+
+    public abstract void usePowerAndAngle(double voltage, double angle);
 }

@@ -50,6 +50,12 @@ public class SwerveModuleBasic extends SwerveModuleIO {
     }
 
     @Override
+    public void setTargetStateVoltages(SwerveModuleState targetState) {
+        drivingMotor.setVoltage(targetState.speedMetersPerSecond);
+        steeringMotor.setControl(targetState.angle.getRotations(),ControlMode.POSITION);
+    }
+
+    @Override
     protected double getDriveVelocity() {
         return drivingMotor.getVelocity();
     }
@@ -96,5 +102,19 @@ public class SwerveModuleBasic extends SwerveModuleIO {
                     canCoder.getMagnetHealth().toString());
             Logger.recordOutput("basic module/" + constants.name() + "/cancoder pos", canCoder.getAbsolutePosition().getValueAsDouble()  );
         }
+    }
+
+    public void setDriveVoltage(double voltage){
+      drivingMotor.setVoltage(voltage);
+    }
+
+    public void setSteerVoltage(double voltage){
+        steeringMotor.setVoltage(voltage);
+    }
+
+    @Override
+    public void usePowerAndAngle(double voltage, double angle) {
+        setDriveVoltage(voltage);
+        steeringMotor.setControl(angle, ControlMode.POSITION);
     }
 }
