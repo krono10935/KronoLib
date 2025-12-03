@@ -60,7 +60,7 @@ public class VisionIOPhotonSim extends VisionIOPhoton {
         // Create a simulated PhotonCamera based on our properties
         cameraSim = new PhotonCameraSim(camera, cameraProp);
 
-        visionSim.addCamera(cameraSim, CamerasConstants.FRONT_CAMERA.ROBOT_TO_CAMERA);
+        // visionSim.addCamera(cameraSim, CamerasConstants.FRONT_CAMERA.ROBOT_TO_CAMERA);
     }
 
 

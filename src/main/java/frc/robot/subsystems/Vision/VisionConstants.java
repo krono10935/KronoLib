@@ -39,11 +39,26 @@ public class VisionConstants {
                 new Rotation3d(0,  Units.degreesToRadians(-34),0)
                 
             ),
-            0.1, // XY standard deviation factor
-            0.1, // Theta standard deviation factor
+            0.76, // XY standard deviation factor
+            0.67, // Theta standard deviation factor
              0.05,// Minimum XY standard deviation
               Math.toRadians(5)// Minimum Theta standard deviation
             
+        ),
+        FRONT_CAMERA_2(
+            PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY,
+            "bohen",
+            new Transform3d(
+                new Translation3d(0.285, -0.105, 0.113),
+                new Rotation3d(Units.degreesToRadians(-2),  Units.degreesToRadians(-29),0)
+                
+            ),
+            0.67, // XY standard deviation factor
+            0.76, // Theta standard deviation factor
+             0.05,// Minimum XY standard deviation
+              Math.toRadians(5)// Minimum Theta standard deviation
+
+
         );
         
        
@@ -71,14 +86,14 @@ public class VisionConstants {
                  * The standard deviation factor for XY
                  */
                 public final double XY_STD_DEV_FACTOR;
-                public final LoggedNetworkNumber MIN_XY_STD_DEV_NETWORK = new LoggedNetworkNumber("/Tuning/XYSTDDEV", 0.1);
+                public final LoggedNetworkNumber MIN_XY_STD_DEV_NETWORK;
         
                 /**
                  * The standard deviation factor for Theta
                  */
                 public final double THETA_STD_DEV_FACTOR;
 
-                public final LoggedNetworkNumber MIN_THETA_STD_DEV_NETWORK = new LoggedNetworkNumber("/Tuning/THETASTDDEV",0.1);
+                public final LoggedNetworkNumber MIN_THETA_STD_DEV_NETWORK ;
             
                 
                 /**
@@ -118,7 +133,11 @@ public class VisionConstants {
 
             this.MIN_XY_STD_DEV = minXYStd;
 
+            MIN_XY_STD_DEV_NETWORK = new LoggedNetworkNumber("/Tuning/XYSTDDEV/" + this.CAMERA_NAME, xyStdFactor);
+
             this.MIN_THETA_STD_DEV = minThetaStd;
+
+            MIN_THETA_STD_DEV_NETWORK = new LoggedNetworkNumber("/Tuning/THETASTDDEV/"+ this.CAMERA_NAME,thetaStdFactor);
         }
 
 

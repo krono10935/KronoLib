@@ -38,7 +38,7 @@ public class Vision extends SubsystemBase {
     void acceptNew(Pose2d visionEstimate, double timestamp, Matrix<N3,N1> visionStdDevs);
 
     /** Default no-op consumer for convenience */
-    VisionConsumer NO_OP = (visionEstimate, timestamp, visionStdDevs) -> {};
+    VisionConsumer NO_OP = (visionEstimate, timestamp, visionStdDevs) -> Logger.recordOutput("Vision/estimate", visionEstimate);;
   }
 
   /**
@@ -168,6 +168,10 @@ public class Vision extends SubsystemBase {
       stdDevFactor * camera.constants.MIN_THETA_STD_DEV_NETWORK.get(),
       camera.constants.MIN_THETA_STD_DEV
     );
+
+    Logger.recordOutput("Vision/THETA", camera.constants.MIN_THETA_STD_DEV_NETWORK.get());
+    Logger.recordOutput("Vision/XY", camera.constants.MIN_XY_STD_DEV_NETWORK.get());
+
 
     return VecBuilder.fill(stdDevLinear, stdDevLinear, stdDevAngular);
   }
