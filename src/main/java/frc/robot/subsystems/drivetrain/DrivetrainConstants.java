@@ -37,12 +37,12 @@ public class DrivetrainConstants {
          * the angle Trapezoid Profile constraints for autonomous
          */
         public static final TrapezoidProfile.Constraints ANGLE_AUTO_CONSTRAINTS =
-                new TrapezoidProfile.Constraints(MAX_ANGULAR_SPEED/2, Units.degreesToRadians(45));
+                new TrapezoidProfile.Constraints(MAX_ANGULAR_SPEED/1.2, Units.degreesToRadians(45));
         /**
          * the angle Trapezoid Profile constraints for tele-op
          */
         public static final TrapezoidProfile.Constraints ANGLE_TELE_CONSTRAINTS =
-                new TrapezoidProfile.Constraints(MAX_ANGULAR_SPEED/2, Units.degreesToRadians(45));
+                new TrapezoidProfile.Constraints(MAX_ANGULAR_SPEED/1.2, Units.degreesToRadians(45));
         /**
          * linear PID constants
          */
@@ -50,7 +50,7 @@ public class DrivetrainConstants {
         /**
          * angular PID constants
          */
-        public static final PIDGains ANGULAR_PID_GAINS = new PIDGains(1,0,0);
+        public static final PIDGains ANGULAR_PID_GAINS = new PIDGains(2,0,0);
         /**
          * the minimum distance from the current pose to the goal where we will not scale the velocity
          */
@@ -62,11 +62,11 @@ public class DrivetrainConstants {
         /**
          * the distance which above the FF is at 100% and below is 100%-0%.
          */
-        public static final double FF_MAX_DISTANCE = 0.03;
+        public static final double FF_MAX_DISTANCE = 0.1;
         /**
          * the distance which above the FF is at 0%-100% and below is 0%.
          */
-        public static final double FF_MIN_DISTANCE = 0.01;
+        public static final double FF_MIN_DISTANCE = 0.025;
         /**
          * the angle which above the FF is at 100% and below is 100%-0%.
          */

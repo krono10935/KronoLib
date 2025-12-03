@@ -69,6 +69,8 @@ public class DriveToPoseCommand extends Command {
      */
     private double absPoseError;
 
+    private Pose2d goalPose_;
+
 
     public DriveToPoseCommand(Drivetrain drivetrain, Supplier<Pose2d> goalPose) {
         robotPose = drivetrain::getEstimatedPosition;
@@ -130,6 +132,7 @@ public class DriveToPoseCommand extends Command {
     public void initialize() {
         resetState();
         Logger.recordOutput("driveToPose/goalPose", goalPose.get());
+        goalPose_ = goalPose.get();
     }
 
     /**
@@ -142,7 +145,7 @@ public class DriveToPoseCommand extends Command {
     public TrapezoidProfile.State calcProfile(Pose2d goal, Pose2d pose, double error) {
         var profileDirection2d = goal.getTranslation().minus(lastSetPoint);
         var profileDirection = profileDirection2d.toVector();
-        Logger.recordOutput("stupid", profileDirection2d.getAngle());
+
         //if the distance from the current pose to the goal is less then a constant then we will not scale the velocity
         //vector according to the direction vector.
         double velocity = profileDirection.norm()
@@ -162,9 +165,8 @@ public class DriveToPoseCommand extends Command {
         //let u be goal pose vector
         //vectoric function:
         //w = v * t + u * (1 - t)
+        //if you are reading this use Translation2D.interpolate instead
         lastSetPoint = pose.getTranslation().times(scalar).plus(goal.getTranslation().times(1 - scalar));
-        Logger.recordOutput("next state pos", nextState.position);
-        Logger.recordOutput("next state vol", nextState.velocity);
         return nextState;
     }
 
@@ -181,7 +183,7 @@ public class DriveToPoseCommand extends Command {
     @Override
     public void execute() {
         Pose2d pose = robotPose.get();
-        Pose2d goal = goalPose.get();
+        Pose2d goal = goalPose_;
         var poseError = pose.relativeTo(goal);
         absPoseError = poseError.getTranslation().getNorm();
         absAngleError = Math.abs(poseError.getRotation().getRadians());
@@ -193,7 +195,6 @@ public class DriveToPoseCommand extends Command {
                 DrivetrainConstants.DriveToPose.FF_MAX_DISTANCE);
 
         var errorAngle = pose.getTranslation().minus(goal.getTranslation()).getAngle();
-        Logger.recordOutput("errorAngle", errorAngle);
 
         lastSetpointVelocity = new Translation2d(targetVelocityFF, errorAngle).toVector();
 
@@ -208,13 +209,13 @@ public class DriveToPoseCommand extends Command {
 
         var driveVelocity = new Translation2d(targetVelocity, errorAngle);
 
-//        lastSetpointVelocity = driveVelocity.toVector();
-
-        double angularVelocity = angularPIDController.calculate(pose.getRotation().getRadians(),
+        double angularVelocityPID = angularPIDController.calculate(pose.getRotation().getRadians(),
                 goal.getRotation().getRadians());
 
-        angularVelocity += angularPIDController.getSetpoint().velocity * FFScalar(absAngleError,
+        double angularVelocityFF = angularPIDController.getSetpoint().velocity * FFScalar(absAngleError,
                 DrivetrainConstants.DriveToPose.FF_MIN_ANGLE, DrivetrainConstants.DriveToPose.FF_MAX_ANGLE);
+
+        double angularVelocity = angularVelocityPID + angularVelocityFF;
 
 
         if(absAngleError <= DrivetrainConstants.DriveToPose.ANGLE_TOLERANCE)
@@ -224,11 +225,26 @@ public class DriveToPoseCommand extends Command {
                 pose.getRotation());
 
         drivetrain.drive(speeds);
-        Logger.recordOutput("desiredAutoSpeeds", speeds);
+
+        //Logging
         Logger.recordOutput("driveToPose/lastSetPoint", new Pose2d(lastSetPoint,
                 Rotation2d.fromRadians(angularPIDController.getSetpoint().position)));
-        Logger.recordOutput("driveToPose/profile/position", nextState.position);
-        Logger.recordOutput("driveToPose/profile/velocity", nextState.velocity);
+
+        Logger.recordOutput("driveToPose/nextState/position", nextState.position);
+        Logger.recordOutput("driveToPose/nextState/velocity", nextState.velocity);
+
+        Logger.recordOutput("driveToPose/angularError", absAngleError);
+        Logger.recordOutput("driveToPose/poseError", absPoseError);
+
+        Logger.recordOutput("driveToPose/velocity/total", targetVelocity);
+        Logger.recordOutput("driveToPose/velocity/PID", targetVelocityPID);
+        Logger.recordOutput("driveToPose/velocity/feedForward", targetVelocityFF);
+
+        Logger.recordOutput("driveToPose/angularVelocity/total", angularVelocity);
+        Logger.recordOutput("driveToPose/angularVelocity/PID", angularVelocityPID);
+        Logger.recordOutput("driveToPose/angularVelocity/feedForward", angularVelocityFF);
+
+
 
     }
 

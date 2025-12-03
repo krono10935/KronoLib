@@ -9,8 +9,8 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.commands.auto.DriveToPoseCommand;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.swerve.Swerve;
@@ -32,6 +32,8 @@ public class RobotContainer
     
     public Command getAutonomousCommand()
     {
-        return new DriveToPoseCommand(drivetrain, () -> new Pose2d(8,5, Rotation2d.fromDegrees(45)));
+        return Commands.print("Hi");
     }
+
+
 }
