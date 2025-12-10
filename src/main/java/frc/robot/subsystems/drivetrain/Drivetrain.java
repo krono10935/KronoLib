@@ -1,7 +1,9 @@
 package frc.robot.subsystems.drivetrain;
 
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.DriveFeedforwards;
+import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 import edu.wpi.first.math.Matrix;
@@ -23,20 +25,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.PPController;
 import frc.robot.subsystems.drivetrain.gyro.GyroIO;
+import frc.robot.subsystems.drivetrain.gyro.GyroIOPigeon;
 import frc.robot.subsystems.drivetrain.gyro.GyroIOSim;
-
-import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
-
 import frc.robot.subsystems.drivetrain.module.SwerveModuleBasic;
 import frc.robot.subsystems.drivetrain.module.SwerveModuleConstants;
 import frc.robot.subsystems.drivetrain.module.SwerveModuleIO;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.util.PathPlannerLogging;
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 public class Drivetrain extends SubsystemBase {
 
@@ -67,12 +65,14 @@ public class Drivetrain extends SubsystemBase {
 
 
 
-    public Drivetrain(BooleanSupplier isRedAlliance, Supplier<Double> batteryVoltageSupplier) {
+    public Drivetrain(Supplier<Double> batteryVoltageSupplier) {
         if(RobotBase.isReal()) {
-            gyroIO = new GyroIOSim(this::getChassisSpeeds, isRedAlliance); //TODO: create real gyro
+            gyroIO = new GyroIOPigeon(DrivetrainConstants.PIGEON_ID);
+            this.batteryVoltageSupplier = batteryVoltageSupplier;
         }
         else {
-            gyroIO = new GyroIOSim(this::getChassisSpeeds, isRedAlliance);
+            gyroIO = new GyroIOSim(this::getChassisSpeeds);
+            this.batteryVoltageSupplier = RobotController::getBatteryVoltage;
         }
 
         for(int i=0;i<4;i++){
@@ -81,7 +81,7 @@ public class Drivetrain extends SubsystemBase {
             modulePositions[i] = io[i].getPosition();
         }
 
-        this.batteryVoltageSupplier = batteryVoltageSupplier;
+
 
         setpointGenerator = new SwerveSetpointGenerator(
                 DrivetrainConstants.ROBOT_CONFIG,
@@ -96,6 +96,8 @@ public class Drivetrain extends SubsystemBase {
         poseEstimator = new SwerveDrivePoseEstimator(kinematics, getGyroAngle(), modulePositions,
                 DrivetrainConstants.startPose2d);
 
+        configPathPlanner();
+
         var setBrake = new InstantCommand(() -> setBrakeMode(true))
                 .ignoringDisable(true);
 
@@ -106,6 +108,7 @@ public class Drivetrain extends SubsystemBase {
         new Trigger(RobotState::isEnabled)
                 .onTrue(setBrake)
                 .onFalse(setCoast);
+
 
         setCoast.schedule();
 
@@ -121,12 +124,7 @@ public class Drivetrain extends SubsystemBase {
                 this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 (speeds, feedforwards) -> drive(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
                 new PPController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                        new PIDConstants(DrivetrainConstants.DriveToPose.LINEAR_PID_GAINS.getK_P(),
-                                DrivetrainConstants.DriveToPose.LINEAR_PID_GAINS.getK_I() ,
-                                DrivetrainConstants.DriveToPose.LINEAR_PID_GAINS.getK_D()), // Translation PID constants
-                        new PIDConstants(DrivetrainConstants.DriveToPose.ANGULAR_PID_GAINS.getK_P(),
-                                DrivetrainConstants.DriveToPose.ANGULAR_PID_GAINS.getK_I() ,
-                                DrivetrainConstants.DriveToPose.ANGULAR_PID_GAINS.getK_D()) // Rotation PID constants
+                        DrivetrainConstants.PID_CONSTANTS, DrivetrainConstants.ANGULAR_PID_CONSTANTS // Rotation PID constants
                 ),
                 DrivetrainConstants.ROBOT_CONFIG, // The robot configuration
                 DrivetrainConstants::shouldFlipPath,

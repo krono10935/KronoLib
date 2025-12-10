@@ -1,13 +1,11 @@
 package frc.robot.subsystems.drivetrain;
-import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.subsystems.drivetrain.module.SwerveModuleConstants;
-import io.github.captainsoccer.basicmotor.gains.PIDGains;
+
 
 public class DrivetrainConstants {
 
@@ -28,6 +26,12 @@ public class DrivetrainConstants {
 
 
     public static final double LOOP_TIME_SECONDS = 0.02;
+
+    public static final PIDConstants PID_CONSTANTS = new PIDConstants(0);
+
+    public static final PIDConstants ANGULAR_PID_CONSTANTS = new PIDConstants(0);
+
+    public static final int PIGEON_ID = 1;
 
 
     public static boolean shouldFlipPath(){

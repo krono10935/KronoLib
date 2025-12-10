@@ -14,7 +14,7 @@ public class GyroIOSim implements GyroIO{
     
     private Rotation2d angle = Rotation2d.kZero;
 
-    public GyroIOSim(Supplier<ChassisSpeeds> speedsSupplier, BooleanSupplier isRedAlliance){
+    public GyroIOSim(Supplier<ChassisSpeeds> speedsSupplier){
         this.speedsSupplier = speedsSupplier;
     }
 
