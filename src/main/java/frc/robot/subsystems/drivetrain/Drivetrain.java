@@ -15,7 +15,9 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -83,7 +85,7 @@ public class Drivetrain extends SubsystemBase {
 
         setpointGenerator = new SwerveSetpointGenerator(
                 DrivetrainConstants.ROBOT_CONFIG,
-                DrivetrainConstants.MAX_ANGULAR_SPEED //TODO: FIND REAL VALUE
+                SwerveModuleConstants.STEER_MAX_SPEED
         );
 
         previousSetpoint = new SwerveSetpoint(new ChassisSpeeds(), inputs.moduleStates,
@@ -115,7 +117,7 @@ public class Drivetrain extends SubsystemBase {
         // Configure AutoBuilder last
         AutoBuilder.configure(
                 this::getEstimatedPosition, // Robot pose supplier
-                this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
+                this::reset, // Method to reset odometry (will be called if your auto has a starting pose)
                 this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 (speeds, feedforwards) -> drive(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
                 new PPController( // PPHolonomicController is the built in path following controller for holonomic drive trains
@@ -208,7 +210,20 @@ public class Drivetrain extends SubsystemBase {
     @Override
     public void periodic() {
         inputs.gyroAngle = gyroIO.update();
-        updateInputs(inputs);
+
+        for (int i=0;i<4;i++){
+            io[i].update();
+            this.inputs.moduleStates[i] = io[i].getState();
+            modulePositions[i] = io[i].getPosition();
+        }
+
+        inputs.speeds = kinematics.toChassisSpeeds(this.inputs.moduleStates);
+
+        poseEstimator.update(getGyroAngle(), modulePositions);
+
+        gyroIO.getEstimatedPosition().ifPresent((
+                pose -> poseEstimator.addVisionMeasurement(pose.pose(), Timer.getTimestamp(), pose.stdDevs())));
+
         Logger.processInputs("drivetrain", inputs);
         Logger.recordOutput("drivetrain/estimated pose", getEstimatedPosition());
 
@@ -217,48 +232,20 @@ public class Drivetrain extends SubsystemBase {
         Logger.recordOutput("drivetrain/current command", currentCommand);
     }
 
-    /**
-     * Update the inputs from the sensors
-     * @param inputs the inputs that stores the data
-     */
-    protected void updateInputs(DrivetrainInputs inputs) {
-        for (int i=0;i<4;i++){
-            io[i].update();
-            this.inputs.moduleStates[i] = io[i].getState();
-            modulePositions[i] = io[i].getPosition();
-        }
-        Logger.recordOutput("swerve real states "  , this.inputs.moduleStates);
-
-        inputs.speeds = kinematics.toChassisSpeeds(this.inputs.moduleStates);
-
-        poseEstimator.update(getGyroAngle(), modulePositions);
-
-
-        Logger.processInputs("drivetrain/swerve", this.inputs);
-
-    }
 
     /**
      * Reset the gyro and the pose estimator states
-     * @param newPose
+     * @param newPose new pose of the robot
      */
     public void reset(Pose2d newPose){
-        gyroIO.reset(newPose.getRotation());
-        resetPose(newPose);
+        gyroIO.reset(newPose);
+        poseEstimator.resetPosition(newPose.getRotation(), modulePositions, newPose);
     }
 
     public void setBrakeMode(boolean isBrake){
         for (SwerveModuleIO module : io){
             module.setBrakeMode(isBrake);
         }
-    }
-
-    /**
-     * Resets the pose of the pose estimator
-     * @param newPose
-     */
-    protected void resetPose(Pose2d newPose) {
-        poseEstimator.resetPosition(newPose.getRotation(), modulePositions, newPose);
     }
 
 }

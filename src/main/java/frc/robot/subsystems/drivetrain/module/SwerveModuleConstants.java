@@ -2,8 +2,12 @@ package frc.robot.subsystems.drivetrain.module;
 
 import java.util.ArrayList;
 
+import com.pathplanner.lib.config.ModuleConfig;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.AngularVelocity;
+import frc.robot.subsystems.drivetrain.DrivetrainConstants;
 import io.github.captainsoccer.basicmotor.BasicMotorConfig;
 import io.github.captainsoccer.basicmotor.BasicMotor.IdleMode;
 import io.github.captainsoccer.basicmotor.BasicMotorConfig.FeedForwardConfig;
@@ -63,9 +67,12 @@ public enum SwerveModuleConstants {
 
 
     public static final double WHEEL_RADIUS_METERS = 0.0508;
-    public static final double DRIVE_GEAR_RATIO = 5.14;
+    public static final double DRIVE_GEAR_RATIO = 6.75;
     public static final int DRIVE_CURRENT_LIMIT = 80;
 
+    private static DCMotor getDriveMotor(){
+        return DCMotor.getKrakenX60(1);
+    }
     /**
      * @return Common drive motor config
      */
@@ -75,7 +82,7 @@ public enum SwerveModuleConstants {
         config.motorConfig.gearRatio = DRIVE_GEAR_RATIO;
         config.motorConfig.unitConversion = 2 * Math.PI * WHEEL_RADIUS_METERS;
         config.motorConfig.idleMode = IdleMode.COAST;
-        config.motorConfig.motorType = DCMotor.getKrakenX60(1);
+        config.motorConfig.motorType = getDriveMotor();
 
         config.currentLimitConfig.statorCurrentLimit = DRIVE_CURRENT_LIMIT;
         config.currentLimitConfig.supplyCurrentLimit = 0;
@@ -85,6 +92,7 @@ public enum SwerveModuleConstants {
 
     public static final double STEER_GEAR_RATIO = 12.8;
     public static final int STEER_CURRENT_LIMIT = 35;
+    public static final AngularVelocity STEER_MAX_SPEED = Units.RPM.of(4000 / STEER_GEAR_RATIO);
 
     /**
      * @return Common steer motor config
@@ -170,5 +178,14 @@ public enum SwerveModuleConstants {
         }
 
         return translations.toArray(new Translation2d[4]);
+    }
+
+    /**
+     *
+     * @return the module config for Path Planner.
+     */
+    public static ModuleConfig getModuleConfig(){
+        return new ModuleConfig(WHEEL_RADIUS_METERS, DrivetrainConstants.MAX_LINEAR_SPEED, 0.9,
+                getDriveMotor().withReduction(DRIVE_GEAR_RATIO), DRIVE_CURRENT_LIMIT, 1);
     }
 }

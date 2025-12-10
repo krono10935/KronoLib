@@ -1,8 +1,10 @@
 package frc.robot.subsystems.drivetrain.gyro;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
+import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
@@ -16,6 +18,12 @@ public class GyroIOSim implements GyroIO{
         this.speedsSupplier = speedsSupplier;
     }
 
+
+    @Override
+    public Optional<GyroPoseOutput> getEstimatedPosition() {
+        return Optional.empty();
+    }
+
     @Override
     public Rotation2d update() {
         double omega = speedsSupplier.get().omegaRadiansPerSecond;
@@ -24,8 +32,8 @@ public class GyroIOSim implements GyroIO{
     }
 
     @Override
-    public void reset(Rotation2d angle) {
-        this.angle = angle;
+    public void reset(Pose2d pose) {
+        this.angle = pose.getRotation();
     }
 
 }
