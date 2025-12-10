@@ -18,8 +18,8 @@ public class DrivetrainConstants {
     public static final double MIN_ANGULAR_SPEED = MIN_LINEAR_SPEED / SwerveModuleConstants.FRONT_LEFT.TRANSLATION.getNorm(); // rad/s
 
     public static final RobotConfig ROBOT_CONFIG = new RobotConfig(
-            20,
-            6,
+            60,
+            6.8,
             SwerveModuleConstants.getModuleConfig(),
             SwerveModuleConstants.getModuleTranslations()
     );

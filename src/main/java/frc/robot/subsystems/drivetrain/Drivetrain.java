@@ -159,7 +159,9 @@ public class Drivetrain extends SubsystemBase {
             var targetSpeed = previousSetpoint.moduleStates()[i];
             io[i].setTargetState(targetSpeed);
         }
-        Logger.recordOutput("drivetrain/swerve/target states", previousSetpoint.moduleStates());
+        Logger.recordOutput("drivetrain/requested speeds", speeds);
+        Logger.recordOutput("drivetrain/target speeds", previousSetpoint.robotRelativeSpeeds());
+        Logger.recordOutput("drivetrain/target states", previousSetpoint.moduleStates());
     }
 
 
