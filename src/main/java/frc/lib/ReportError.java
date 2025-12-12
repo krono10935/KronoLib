@@ -11,6 +11,9 @@ public class ReportError{
         // private constructor to prevent instantiation
     }
 
+    /**
+     * @return the singleton instance of the ReportError class
+     */
     public static ReportError getInstance(){
         if(instance == null){
             instance = new ReportError();
@@ -18,11 +21,11 @@ public class ReportError{
         return instance;
     }
 
+    /**
+     * Adds an ErrorMessage record to the list of Errors to check
+     * @param error
+     */
     public void addError(ErrorMessage error){
         errorLog.add(error);
-    }
-
-    public void SendErrors(){
-        errorLog.forEach(ErrorMessage::update);
     }
 }

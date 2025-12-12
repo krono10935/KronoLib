@@ -15,7 +15,7 @@ public class skebob extends SubsystemBase {
   public skebob() {
     ReportError.getInstance().addError(new ErrorMessage(this, 0,
      "skebob", controller.a(),
-      () -> System.out.println("skebob error triggered")));
+      () -> System.out.println("skebob error triggered"), () -> System.out.println("skebob error untriggered")));
   }
 
   @Override
