@@ -7,14 +7,19 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-
+import frc.robot.leds.LedManager;
+import frc.robot.leds.LedState;
 
 
 public class RobotContainer
 {
     private static  RobotContainer instance;
+    private final LedManager ledManager;
+
     private RobotContainer()
     {
+
+        ledManager = new LedManager();
         configureBindings();
     }
 
