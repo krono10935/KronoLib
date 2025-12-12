@@ -33,7 +33,7 @@ import frc.robot.subsystems.drivetrain.module.SwerveModuleIO;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
-import java.util.function.BooleanSupplier;
+
 import java.util.function.Supplier;
 
 public class Drivetrain extends SubsystemBase {
@@ -62,6 +62,8 @@ public class Drivetrain extends SubsystemBase {
     private final SwerveSetpointGenerator setpointGenerator;
 
     private SwerveSetpoint previousSetpoint;
+
+    private static final DriveFeedforwards ZEROS = DriveFeedforwards.zeros(4);
 
 
 
@@ -148,7 +150,7 @@ public class Drivetrain extends SubsystemBase {
 
     /**
      * Drives the robot at relative speed
-     *
+     *Needs to be called continuously
      * @param speeds the target speed of the robot
      */
     public void drive(ChassisSpeeds speeds) {
@@ -163,6 +165,44 @@ public class Drivetrain extends SubsystemBase {
         Logger.recordOutput("drivetrain/target speeds", previousSetpoint.robotRelativeSpeeds());
         Logger.recordOutput("drivetrain/target states", previousSetpoint.moduleStates());
     }
+
+    /**
+     * set the speeds which regular kinematics
+     * @param speeds the target speed of the robot
+     */
+    public void setChassisSpeeds(ChassisSpeeds speeds) {
+
+        var targetSpeeds = kinematics.toWheelSpeeds(speeds);
+        for (int i = 0; i < 4; i++){
+            targetSpeeds[i].optimize(io[i].getState().angle);
+            targetSpeeds[i].cosineScale(io[i].getState().angle);
+        }
+        previousSetpoint = new SwerveSetpoint(speeds,kinematics.toSwerveModuleStates(speeds),ZEROS);
+
+        for (int i = 0; i < 4; i++){
+            io[i].setTargetState(targetSpeeds[i]);
+        }
+        Logger.recordOutput("drivetrain/requested speeds", speeds);
+        Logger.recordOutput("drivetrain/target speeds", previousSetpoint.robotRelativeSpeeds());
+        Logger.recordOutput("drivetrain/target states", previousSetpoint.moduleStates());
+    }
+
+    /**
+     * Function which stops the robot immediately
+     */
+    public void stop(){
+
+
+        previousSetpoint = new SwerveSetpoint(new ChassisSpeeds(),kinematics.toSwerveModuleStates(new ChassisSpeeds()),ZEROS);
+        for (int i = 0; i < 4; i++){
+            io[i].setTargetState(new SwerveModuleState(0, new Rotation2d(0)));
+        }
+        Logger.recordOutput("drivetrain/requested speeds", new ChassisSpeeds());
+        Logger.recordOutput("drivetrain/target speeds", previousSetpoint.robotRelativeSpeeds());
+        Logger.recordOutput("drivetrain/target states", previousSetpoint.moduleStates());
+    }
+
+
 
 
     /**

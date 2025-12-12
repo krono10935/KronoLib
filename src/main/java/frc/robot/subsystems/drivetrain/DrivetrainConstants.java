@@ -37,11 +37,9 @@ public class DrivetrainConstants {
     public static boolean shouldFlipPath(){
         var currentAlliance = DriverStation.getAlliance();
 
-        // if (currentAlliance.isPresent()) {
-        //     return currentAlliance.get() == DriverStation.Alliance.Red;
-        // }
-        // If no alliance is set, do not flip the path.
-        return false;
+        //         If no alliance is set, do not flip the path.
+        return currentAlliance.filter(alliance -> alliance == DriverStation.Alliance.Red).isPresent();
+
     }
 
 }

@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -28,6 +29,11 @@ public class DriveCommand extends Command {
     addRequirements(drivetrain);
   }
 
+  private Rotation2d angleFieldRelative(){
+      return DrivetrainConstants.shouldFlipPath()?
+              drivetrain.getGyroAngle():drivetrain.getGyroAngle().rotateBy(Rotation2d.k180deg) ;
+  }
+
 
   @Override
   public void execute() {
@@ -35,10 +41,10 @@ public class DriveCommand extends Command {
     double angularSpeed = angularLerp(1 - controller.getRightTriggerAxis());
 
     double xSpeed = deadband(-controller.getLeftX()) * speed;
-    double ySpeed = deadband(-controller.getLeftY()) * speed;
+    double ySpeed = deadband(controller.getLeftY()) * speed;
     double thetaSpeed = deadband(-controller.getRightX()) * angularSpeed;
 
-    drivetrain.drive(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, thetaSpeed, drivetrain.getGyroAngle()));
+    drivetrain.drive(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, thetaSpeed, angleFieldRelative()));
   }
 
   /**
