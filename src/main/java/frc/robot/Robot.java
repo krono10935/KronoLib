@@ -20,7 +20,7 @@ public class Robot extends LoggedRobot
 {
     private Command autonomousCommand;
     
-    private final RobotContainer robotContainer;
+
 
 
     public Robot()
@@ -54,7 +54,7 @@ public class Robot extends LoggedRobot
 
         Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
 
-        robotContainer = new RobotContainer();
+        RobotContainer.getInstance();
     }
 
 
@@ -80,7 +80,7 @@ public class Robot extends LoggedRobot
     @Override
     public void autonomousInit()
     {
-        autonomousCommand = robotContainer.getAutonomousCommand();
+        autonomousCommand = RobotContainer.getInstance().getAutonomousCommand();
         
         if (autonomousCommand != null)
         {

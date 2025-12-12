@@ -12,12 +12,19 @@ import edu.wpi.first.wpilibj2.command.Commands;
 
 public class RobotContainer
 {
-    public RobotContainer()
+    private static  RobotContainer instance;
+    private RobotContainer()
     {
         configureBindings();
     }
-    
-    
+
+    public static RobotContainer getInstance() {
+        if(instance == null){
+            instance = new RobotContainer();
+        }
+        return instance;
+    }
+
     private void configureBindings() {}
     
     
