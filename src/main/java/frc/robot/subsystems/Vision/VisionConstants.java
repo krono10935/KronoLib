@@ -1,15 +1,15 @@
 package frc.robot.subsystems.Vision;
 
+import java.util.List;
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.math.geometry.*;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import org.photonvision.PhotonPoseEstimator;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -35,7 +35,7 @@ public class VisionConstants {
             PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY,
             "dolev",
             new Transform3d(
-                new Translation3d(0.285, -0.015, 0.11),
+                new Translation3d(0.24, -0.015, 0.11),
                 new Rotation3d(0,  Units.degreesToRadians(-34),0)
                 
             ),
@@ -49,8 +49,8 @@ public class VisionConstants {
             PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY,
             "bohen",
             new Transform3d(
-                new Translation3d(0.285, -0.105, 0.113),
-                new Rotation3d(Units.degreesToRadians(-2),  Units.degreesToRadians(-29),0)
+                new Translation3d(0.275, -0.105, 0.113),
+                new Rotation3d(Units.degreesToRadians(90),  Units.degreesToRadians(-29),0)
                 
             ),
             0.67, // XY standard deviation factor
@@ -146,5 +146,22 @@ public class VisionConstants {
     /**
      * The field layout for the 2025 FRC game "Reefscape"
      */
-    public static final AprilTagFieldLayout FIELD_LAYOUT = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+    public static final AprilTagFieldLayout FIELD_LAYOUT = CustomLayout.custom();//AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+
+    public class CustomLayout {
+        public static AprilTagFieldLayout custom(){
+            return new AprilTagFieldLayout(
+                    List.of(
+                            new AprilTag(21, new Pose3d(
+                                    new Translation3d(0,0.24,0.15),
+                                    new Rotation3d(0,0, Math.toRadians(0)))),
+                            new AprilTag(1, new Pose3d(
+                                    new Translation3d(0,0.98,0.92),
+                                    new Rotation3d(0,0, Math.toRadians(0))))
+                            ),
+                    3.00,1.31
+            );
+        }
+    }
+
 }
