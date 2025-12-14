@@ -1,8 +1,11 @@
 package frc.robot.leds;
 
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringEntry;
-import edu.wpi.first.networktables.StringTopic;
+import edu.wpi.first.networktables.*;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.util.Color;
+
+import java.util.ArrayList;
 
 /**
  * Manages the robot LED state by publishing it to NetworkTables.
@@ -11,9 +14,19 @@ import edu.wpi.first.networktables.StringTopic;
  */
 public class LedManager {
 
+    //TODO: Set actual number of leds
+    private final int AMOUNT_OF_LEDS = 2;
     private final NetworkTableInstance nt;
-    private LedState state;
-    private final StringEntry ledStateEntry;
+
+    private LedPreset preset;
+    private final LedPreset NONE = new SolidColorPreset(Color.kBlack,1);
+    private final ArrayList<DoubleArrayEntry> ledColorsEntries;
+    private ArrayList<Color> ledColors;
+
+
+
+
+
 
     /**
      * Creates a new {@code LedManager} that publishes to {@code Leds/LedState}
@@ -21,26 +34,35 @@ public class LedManager {
      */
     public LedManager() {
         nt = NetworkTableInstance.getDefault();
-        StringTopic topic = nt.getStringTopic("Leds/LedState");
-        state = LedState.NONE;
-        ledStateEntry = topic.getEntry(LedState.NONE.getNTKey());
-        publishStateToNT();
+        preset = NONE;
+        ledColorsEntries = new ArrayList<>();
+        for (int i = 0; i <AMOUNT_OF_LEDS ; i++) {
+            ledColorsEntries.add(nt.getDoubleArrayTopic("Leds/led" + i).getEntry(new double[3]));
+        }
+
+
+
+    }
+    public void publishColors(){
+        ledColors=preset.apply(Timer.getFPGATimestamp());
+        for (int i = 0; i < AMOUNT_OF_LEDS; i++) {
+            ledColorsEntries.get(i).set(
+                    convertColorToDoubleArr(ledColors.get(i)));
+        }
     }
 
-    /**
-     * Publishes the current {@link LedState} to NetworkTables.
-     */
-    private void publishStateToNT() {
-        ledStateEntry.set(state.getNTKey());
+    private static double[] convertColorToDoubleArr(Color color){
+        return new double[]{color.red,color.green,color.blue};
     }
 
-    /**
-     * Updates the LED state and publishes the change to NetworkTables.
-     *
-     * @param state the new LED state to apply
-     */
-    public void setState(LedState state) {
-        this.state = state;
-        publishStateToNT();
+    public void setPreset(LedPreset preset){
+        this.preset = preset;
     }
+
+
+
+
+
+
+
 }

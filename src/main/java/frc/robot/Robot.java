@@ -62,6 +62,7 @@ public class Robot extends LoggedRobot
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
         MotorManager.getInstance().periodic(); // must run AFTER CommandScheduler
+        RobotContainer.getInstance().getLedManager().publishColors();
     }
     
     

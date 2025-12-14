@@ -5,10 +5,11 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.leds.FlashingColorPreset;
 import frc.robot.leds.LedManager;
-import frc.robot.leds.LedState;
 
 
 public class RobotContainer
@@ -20,6 +21,7 @@ public class RobotContainer
     {
 
         ledManager = new LedManager();
+        ledManager.setPreset(new FlashingColorPreset(new Color(1.0,1.0,1.0), 2,2));
         configureBindings();
     }
 
@@ -31,6 +33,10 @@ public class RobotContainer
     }
 
     private void configureBindings() {}
+
+    public LedManager getLedManager(){
+        return this.ledManager;
+    }
     
     
     public Command getAutonomousCommand()
