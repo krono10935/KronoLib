@@ -28,10 +28,7 @@ public class LedManager {
 
 
 
-    /**
-     * Creates a new {@code LedManager} that publishes to {@code Leds/LedState}
-     * using the default {@link NetworkTableInstance}.
-     */
+
     public LedManager() {
         nt = NetworkTableInstance.getDefault();
         preset = NONE;
@@ -43,6 +40,10 @@ public class LedManager {
 
 
     }
+
+    /**
+     * publishes the colors to networkTable
+     */
     public void publishColors(){
         ledColors=preset.apply(Timer.getFPGATimestamp());
         for (int i = 0; i < AMOUNT_OF_LEDS; i++) {
@@ -51,10 +52,20 @@ public class LedManager {
         }
     }
 
+
+    /**
+     * util to convert a color to an array to publish to network tables
+     * @param color chosen color
+     * @return the color in {r,g,b}
+     */
     private static double[] convertColorToDoubleArr(Color color){
         return new double[]{color.red,color.green,color.blue};
     }
 
+    /**
+     * set the preset for the leds
+     * @param preset desired preset
+     */
     public void setPreset(LedPreset preset){
         this.preset = preset;
     }
