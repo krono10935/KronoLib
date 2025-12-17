@@ -1,7 +1,12 @@
 package frc.robot.subsystems.Vision;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.units.Unit;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import org.photonvision.PhotonPoseEstimator;
 
@@ -30,28 +35,24 @@ public class VisionConstants {
 
     // enum with all the camera constants
     enum CamerasConstants {
-        // Define the camera constants for the front camera
+//         Define the camera constants for the front cameraP
         FRONT_CAMERA(
             PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY,
             "dolev",
-            new Transform3d(
-                new Translation3d(0.285, -0.015, 0.11),
-                new Rotation3d(0,  Units.degreesToRadians(-34),0)
-                
-            ),
+                new Transform3d(new Translation3d(0.275,0.015,0.08),new Rotation3d(0,Units.degreesToRadians(-33.9),Units.degreesToRadians(-1.3))),
             0.76, // XY standard deviation factor
             0.67, // Theta standard deviation factor
              0.05,// Minimum XY standard deviation
               Math.toRadians(5)// Minimum Theta standard deviation
-            
+
         ),
         FRONT_CAMERA_2(
             PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY,
             "bohen",
             new Transform3d(
-                new Translation3d(0.285, -0.105, 0.113),
-                new Rotation3d(Units.degreesToRadians(-2),  Units.degreesToRadians(-29),0)
-                
+                new Translation3d(0.235, 0.1, 0.065),
+                new Rotation3d(Units.degreesToRadians(-1.7),  Units.degreesToRadians(-31.5),Units.degreesToRadians(2))
+
             ),
             0.67, // XY standard deviation factor
             0.76, // Theta standard deviation factor
@@ -141,10 +142,20 @@ public class VisionConstants {
         }
 
 
+
+
         
     }
     /**
      * The field layout for the 2025 FRC game "Reefscape"
      */
-    public static final AprilTagFieldLayout FIELD_LAYOUT = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+
+
+    public static final AprilTagFieldLayout FIELD_LAYOUT =getFieldLayout(new AprilTag(
+            1,new Pose3d(new Translation3d(0,0,0.23), new Rotation3d(Units.degreesToRadians(0),0,0))),
+            new AprilTag(21, new Pose3d(new Translation3d(0,0.45,0.42), new Rotation3d()) ));
+
+    public static AprilTagFieldLayout  getFieldLayout(AprilTag... tag) {
+        return new AprilTagFieldLayout(Arrays.stream(tag).toList(),5.0,5.0 );
+    }
 }

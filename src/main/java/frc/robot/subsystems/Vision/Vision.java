@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
+
+import edu.wpi.first.math.util.Units;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.Matrix;
@@ -124,9 +126,10 @@ public class Vision extends SubsystemBase {
     double y = pose.getY();
     double z = pose.getZ();
 
-    return isWithinRange(x,0, VisionConstants.FIELD_LAYOUT.getFieldLength()) &&
-           isWithinRange(y,0, VisionConstants.FIELD_LAYOUT.getFieldWidth()) &&
-           Math.abs(z) <= VisionConstants.MAX_HEIGHT_DEV;
+//    return isWithinRange(x,0, VisionConstants.FIELD_LAYOUT.getFieldLength()) &&
+//           isWithinRange(y,0, VisionConstants.FIELD_LAYOUT.getFieldWidth()) &&
+//           Math.abs(z) <= VisionConstants.MAX_HEIGHT_DEV;
+      return true;
   }
 
   /**
@@ -219,6 +222,8 @@ public class Vision extends SubsystemBase {
 
         // Track valid poses for logging
         validPoses.add(pose);
+
+        Logger.recordOutput("Vision/"  + camera.constants.CAMERA_NAME+ "/x" ,pose.getTranslation().getX());
       }
     }
 

@@ -26,6 +26,7 @@ public class RobotContainer
         drivetrain = new Swerve(() -> false);
         vision = new Vision(drivetrain::addVisionMeasurement, () -> new Pose2d());
         configureBindings();
+
     }
     
     
