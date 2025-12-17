@@ -17,6 +17,7 @@ import org.littletonrobotics.conduit.ConduitApi;
 
 public class RobotContainer
 {
+<<<<<<< HEAD
     CommandXboxController cmd;
 
     private static RobotContainer instance;
@@ -30,6 +31,9 @@ public class RobotContainer
         return instance;
     }
 
+=======
+    private static  RobotContainer instance;
+>>>>>>> origin/main
     private RobotContainer()
     {
         drivetrain = new Drivetrain(ConduitApi.getInstance()::getPDPVoltage);
@@ -40,8 +44,14 @@ public class RobotContainer
 
         configureBindings();
     }
-    
-    
+
+    public static RobotContainer getInstance() {
+        if(instance == null){
+            instance = new RobotContainer();
+        }
+        return instance;
+    }
+
     private void configureBindings() {}
     
     
