@@ -1,57 +1,68 @@
 package frc.robot.leds;
 
 import edu.wpi.first.networktables.*;
-import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 
-import java.util.ArrayList;
 import java.util.function.Supplier;
 
 /**
  * Manages the robot LED state by publishing it to NetworkTables.
  * <p>
- * {@link NetworkTableInstance} and publishes to the topic {@code Leds/LedState}.
  */
+
 public class LedManager {
 
-    //TODO: Set actual number of leds
-    private final int AMOUNT_OF_LEDS = 2;
-    private final NetworkTableInstance nt;
-
-
-    private final Supplier<LedPreset> preset;
-    private final LedPreset NONE = new SolidColorPreset(Color.kBlack,1);
-    private final ArrayList<DoubleArrayEntry> ledColorsEntries;
-    private ArrayList<Color> ledColors;
-
-
-    /**
-     *
-     * @param ledPresetSupplier supplier for the preset to use
-     */
-
-    public LedManager(Supplier<LedPreset> ledPresetSupplier) {
-        nt = NetworkTableInstance.getDefault();
-        preset=ledPresetSupplier;
-        ledColorsEntries = new ArrayList<>();
-        for (int i = 0; i <AMOUNT_OF_LEDS ; i++) {
-            ledColorsEntries.add(nt.getDoubleArrayTopic("Leds/led" + i).getEntry(new double[3]));
+    public record LedState(String pattern, Color mainColor, Color secondaryColor, double hz, int start, int end){
+        public LedState(LedPattern pattern, Color mainColor, Color secondaryColor, double hz, LedLocation location){
+            this(pattern.toString(), mainColor, secondaryColor, hz,location.start, location.end);
         }
+    }
+    private final NetworkTableEntry patternEntry;
 
+    private final NetworkTableEntry mainColorEntry;
 
+    private final NetworkTableEntry secondaryColorEntry;
+
+    private final NetworkTableEntry hzEntry;
+
+    private final NetworkTableEntry rangeEntry;
+
+    private final NetworkTableEntry hasChangeEntry;
+
+    public LedManager() {
+        var nt = NetworkTableInstance.getDefault();
+
+        var table = nt.getTable("Led");
+
+        patternEntry = table.getEntry("pattern");
+
+        mainColorEntry = table.getEntry("mainColor");
+
+        secondaryColorEntry = table.getEntry("secondaryColor");
+
+        hzEntry = table.getEntry("hz");
+
+        rangeEntry = table.getEntry("range");
+
+        hasChangeEntry = table.getEntry("hasChange");
 
     }
 
     /**
      * publishes the colors to networkTable
+     * @param state the led state to activate for the robot
      */
-    public void publishColors(){
-        ledColors=preset.get().apply(Timer.getFPGATimestamp());
-        for (int i = 0; i < AMOUNT_OF_LEDS; i++) {
-            ledColorsEntries.get(i).set(
-                    convertColorToDoubleArr(ledColors.get(i)));
-        }
+    public void setColors(LedState state){
+        patternEntry.setString(state.pattern);
+        mainColorEntry.setDoubleArray(convertColorToDoubleArr(state.mainColor));
+        secondaryColorEntry.setDoubleArray(convertColorToDoubleArr(state.secondaryColor));
+        hzEntry.setDouble(state.hz);
+        rangeEntry.setDoubleArray(new double[]{state.start, state.end});
+        hasChangeEntry.setBoolean(true);
     }
 
 
