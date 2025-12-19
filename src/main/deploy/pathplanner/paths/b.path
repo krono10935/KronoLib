@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.248809378487723,
-        "y": 5.201753452845981
+        "x": 3.9389360700334817,
+        "y": 5.175790405273437
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.758021763392857,
-        "y": 4.821591186523437
+        "x": 5.179806518554687,
+        "y": 6.430126953125
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "a"
     },
     {
       "anchor": {
-        "x": 2.2338932582310265,
-        "y": 7.106747436523437
+        "x": 2.1697252546037946,
+        "y": 2.928533063616071
       },
       "prevControl": {
-        "x": 3.3744310651506693,
-        "y": 6.185441807338169
+        "x": 2.4535845075334817,
+        "y": 2.012175205775669
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,19 +31,7 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "F",
-      "waypointRelativePos": 0.5343104084645669,
-      "endWaypointRelativePos": 1.0,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "DriveToPoseCommand"
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -54,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 2.0,
-    "rotation": 120.4447583272636
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": null,

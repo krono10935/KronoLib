@@ -22,6 +22,11 @@ public class DrivetrainConstants {
     public static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / SwerveModuleConstants.FRONT_LEFT.TRANSLATION.getNorm(); // rad/s
     public static final double MIN_ANGULAR_SPEED = MIN_LINEAR_SPEED / SwerveModuleConstants.FRONT_LEFT.TRANSLATION.getNorm(); // rad/s
 
+    /**
+     * the distance in which the auto should transfer from PP path to DriveToPose.
+     */
+    public static final double DISTANCE_TO_STOP_PP = 2; //m
+
     public static class DriveToPose{
         /**
          * the linear Trapezoid Profile constraints for autonomous
