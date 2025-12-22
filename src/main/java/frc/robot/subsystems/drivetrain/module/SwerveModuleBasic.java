@@ -1,6 +1,7 @@
 package frc.robot.subsystems.drivetrain.module;
 
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import io.github.captainsoccer.basicmotor.ctre.talonfx.BasicTalonFX;
 import io.github.captainsoccer.basicmotor.sim.motor.BasicMotorSim;
 import org.littletonrobotics.junction.Logger;
@@ -29,11 +30,13 @@ public class SwerveModuleBasic extends SwerveModuleIO {
             steeringMotor = new BasicTalonFX(constants.STEERING_CONFIG);
 
             canCoder = createCANcoder(constants);
+            steeringMotor.resetEncoder(canCoder.getPosition().getValueAsDouble());
 
-            ((BasicTalonFX) steeringMotor).useRemoteCanCoder(canCoder, constants.STEERING_CONFIG.motorConfig.gearRatio);
+//            ((BasicTalonFX) steeringMotor).useRemoteCanCoder(canCoder, constants.STEERING_CONFIG.motorConfig.gearRatio);
 
             canCoder.getMagnetHealth().setUpdateFrequency(4);
             canCoder.optimizeBusUtilization();
+
         }
         else{
             drivingMotor = new BasicMotorSim(constants.DRIVING_CONFIG);
@@ -46,6 +49,12 @@ public class SwerveModuleBasic extends SwerveModuleIO {
     @Override
     public void setTargetState(SwerveModuleState targetState) {
         drivingMotor.setControl(targetState.speedMetersPerSecond,ControlMode.VELOCITY);
+        steeringMotor.setControl(targetState.angle.getRotations(),ControlMode.POSITION);
+    }
+
+    @Override
+    public void setTargetStateVoltages(SwerveModuleState targetState) {
+        drivingMotor.setVoltage(targetState.speedMetersPerSecond);
         steeringMotor.setControl(targetState.angle.getRotations(),ControlMode.POSITION);
     }
 
@@ -94,7 +103,22 @@ public class SwerveModuleBasic extends SwerveModuleIO {
         if (canCoder != null){
             Logger.recordOutput("basic module/" + constants.name() + "/magnet health",
                     canCoder.getMagnetHealth().toString());
-            Logger.recordOutput("basic module/" + constants.name() + "/cancoder pos", canCoder.getAbsolutePosition().getValueAsDouble()  );
+            Logger.recordOutput("basic module/" + constants.name() + "/cancoder pos", canCoder.getPosition().getValueAsDouble()  );
         }
+        SmartDashboard.putData(drivingMotor.getController());
+    }
+
+    public void setDriveVoltage(double voltage){
+        drivingMotor.setVoltage(voltage);
+    }
+
+    public void setSteerVoltage(double voltage){
+        steeringMotor.setVoltage(voltage);
+    }
+
+    @Override
+    public void usePowerAndAngle(double voltage, double angle) {
+        setDriveVoltage(voltage);
+        steeringMotor.setControl(angle, ControlMode.POSITION);
     }
 }

@@ -5,6 +5,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -17,8 +18,7 @@ import org.littletonrobotics.conduit.ConduitApi;
 
 public class RobotContainer
 {
-<<<<<<< HEAD
-    CommandXboxController cmd;
+    private CommandXboxController cmd;
 
     private static RobotContainer instance;
     public final Drivetrain drivetrain;
@@ -31,9 +31,6 @@ public class RobotContainer
         return instance;
     }
 
-=======
-    private static  RobotContainer instance;
->>>>>>> origin/main
     private RobotContainer()
     {
         drivetrain = new Drivetrain(ConduitApi.getInstance()::getPDPVoltage);
@@ -45,14 +42,24 @@ public class RobotContainer
         configureBindings();
     }
 
-    public static RobotContainer getInstance() {
-        if(instance == null){
-            instance = new RobotContainer();
-        }
-        return instance;
+    private void configureBindings() {
+        //        controller.a().whileTrue(
+//            swerveSysID.sysIdQuasistaticDrive(Direction.kForward)
+//        );
+//
+//        controller.b().whileTrue(
+//            swerveSysID.sysIdQuasistaticDrive(Direction.kReverse)
+//        );
+//
+//        controller.y().whileTrue(
+//            swerveSysID.sysIdDynamicDrive(Direction.kForward)
+//        );
+//
+//        controller.x().whileTrue(
+//            swerveSysID.sysIdDynamicDrive(Direction.kReverse)
+//        );
+        cmd.a().onTrue(new InstantCommand(() -> drivetrain.reset(new Pose2d())));
     }
-
-    private void configureBindings() {}
     
     
     public Command getAutonomousCommand()

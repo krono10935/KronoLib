@@ -44,7 +44,7 @@ public class DriveCommand extends Command {
     double ySpeed = deadband(controller.getLeftY()) * speed;
     double thetaSpeed = deadband(-controller.getRightX()) * angularSpeed;
 
-    drivetrain.drive(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, thetaSpeed, angleFieldRelative()));
+    drivetrain.setChassisSpeeds(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, thetaSpeed, angleFieldRelative()));
   }
 
   /**

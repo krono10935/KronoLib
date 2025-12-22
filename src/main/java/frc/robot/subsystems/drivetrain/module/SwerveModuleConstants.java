@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.drivetrain.DrivetrainConstants;
 import io.github.captainsoccer.basicmotor.BasicMotorConfig;
 import io.github.captainsoccer.basicmotor.BasicMotor.IdleMode;
@@ -16,54 +17,59 @@ import io.github.captainsoccer.basicmotor.ctre.talonfx.BasicTalonFXConfig;
 import io.github.captainsoccer.basicmotor.gains.ConstraintsGains.ConstraintType;
 import io.github.captainsoccer.basicmotor.gains.FeedForwardsGains;
 import io.github.captainsoccer.basicmotor.gains.PIDGains;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public enum SwerveModuleConstants {
+
+
     FRONT_LEFT(
-            12,  0.23, 10,
-            new PIDGains(5, 0, 0, 0, 0, 0),
-            new FeedForwardsGains(3),
-            1.2,
+            12,  0, 10
+            ,
+            new PIDGains(5, 7, 0, 0, 0, 0),
+            new FeedForwardsGains(2.016),
+            0.13666,
             11,
-            new PIDGains(150, 0, 0, 0, 0, 0.001),
+            new PIDGains(10, 40, 0, 0.05, 1, 0.001),
             new FeedForwardsGains(0),
-            1.7245,0.15,
+            1.4128,0.725,
             new Translation2d(0.29, 0.29)),
 
 
     FRONT_RIGHT(
-            6, 0.015, 4,
-            new PIDGains(5, 0, 0, 0, 0, 0),
-            new FeedForwardsGains(3),
-            1.2,
-            14,
-            new PIDGains(150, 0, 0, 0, 0, 0.001),
+            15, 0, 13,
+            new PIDGains(5, 7, 0, 0, 0, 0),
+            new FeedForwardsGains(1.8745),
+            0.12113,
+            7,
+            new PIDGains(10, 40, 0, 0.05, 1, 0.001),
             new FeedForwardsGains(0),
-            1.7245,0.15,
+            1.3695,0.61619,
             new Translation2d(0.29, -0.29)),
 
 
     BACK_LEFT(
-            3, 0.124, 1,
-            new PIDGains(5, 0, 0, 0, 0, 0),
-            new FeedForwardsGains(3),
-            1.2,
+            3, 0, 1,
+            new PIDGains(5, 7, 0, 0, 0, 0),
+            new FeedForwardsGains(1.8745),
+            0.12113,
             2,
-            new PIDGains(150, 0, 0, 0, 0, 0.001),
+            new PIDGains(10, 40, 0, 0.05, 1, 0.001),
             new FeedForwardsGains(0),
-            1.7245,0.15,
+            1.4873,0.28857,
             new Translation2d(-0.29, 0.29)),
 
 
     BACK_RIGHT(
-            15, 0.254, 13,
-            new PIDGains(5, 0, 0, 0, 0, 0),
-            new FeedForwardsGains(3),
-            1.2,
-            7,
-            new PIDGains(150, 0, 0, 0, 0, 0.001),
+            6, 0, 4,
+            new PIDGains(5, 7, 0, 0, 0, 0),
+            new FeedForwardsGains(2.05),
+            0.12315,
+            14,
+            new PIDGains(10, 40, 0, 0.05, 1, 0.001),
             new FeedForwardsGains(0),
-            1.7245,0.15,
-                new Translation2d(-0.29, -0.29));
+            1.3854,0.83239,
+            new Translation2d(-0.29, -0.29));
+
 
 
     public static final double WHEEL_RADIUS_METERS = 0.0508;
@@ -77,6 +83,7 @@ public enum SwerveModuleConstants {
      * @return Common drive motor config
      */
     private static BasicMotorConfig getDriveMotorCommonConfig() {
+
         var config = new BasicTalonFXConfig();
 
         config.motorConfig.gearRatio = DRIVE_GEAR_RATIO;

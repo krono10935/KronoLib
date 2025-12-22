@@ -180,6 +180,7 @@ public class Drivetrain extends SubsystemBase {
         previousSetpoint = new SwerveSetpoint(speeds,kinematics.toSwerveModuleStates(speeds),ZEROS);
 
         for (int i = 0; i < 4; i++){
+
             io[i].setTargetState(targetSpeeds[i]);
         }
         Logger.recordOutput("drivetrain/requested speeds", speeds);
@@ -288,5 +289,55 @@ public class Drivetrain extends SubsystemBase {
         }
     }
 
+    public void setSteerVoltage(double voltage){
+        for (SwerveModuleIO module : io){
+            module.setSteerVoltage(voltage);
+        }
+    }
+
+    public void setDriveVoltage(double voltage){
+        for (SwerveModuleIO module : io){
+            module.setDriveVoltage(voltage);
+        }
+    }
+
+    public void usePowerAndAngle(double voltage, Rotation2d angle) {
+        var targetSpeeds = new SwerveModuleState[4];
+        for (int i = 0; i < 4; i++){
+            targetSpeeds[i] = new SwerveModuleState(
+                    voltage,
+                    angle
+            );
+        }
+
+        for (int i = 0; i < 4; i++){
+            targetSpeeds[i].cosineScale(io[i].getState().angle);
+            io[i].setTargetStateVoltages(targetSpeeds[i]);
+        }
+        Logger.recordOutput("drivetrain/swerve/target states sysid with angle", targetSpeeds);
+    }
+
+    public void spinWithPower(double voltage) {
+        var targetSpeeds = new SwerveModuleState[4];
+        for (int i = 0; i < 2; i++){
+            targetSpeeds[i] = new SwerveModuleState(
+                    voltage,
+                    Rotation2d.fromDegrees(-45 - 90 * i)
+            );
+        }
+
+        for (int i = 0; i < 2; i++){
+            targetSpeeds[i+2] = new SwerveModuleState(
+                    voltage,
+                    Rotation2d.fromDegrees(45 + 90 * i)
+            );
+        }
+
+        for (int i = 0; i < 4; i++){
+            targetSpeeds[i].cosineScale(io[i].getState().angle);
+            io[i].setTargetStateVoltages(targetSpeeds[i]);
+        }
+        Logger.recordOutput("drivetrain/swerve/target states sysid", targetSpeeds);
+    }
 }
 
