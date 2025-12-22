@@ -133,6 +133,7 @@ public class DriveToPoseCommand extends Command {
         resetState();
         Logger.recordOutput("driveToPose/goalPose", goalPose.get());
         goalPose_ = goalPose.get();
+        Logger.recordOutput("driveToPose/isEnd:", false);
     }
 
     /**
@@ -262,5 +263,7 @@ public class DriveToPoseCommand extends Command {
     @Override
     public void end(boolean interrupted) {
         drivetrain.drive(new ChassisSpeeds());
+        Logger.recordOutput("driveToPose/isEnd:", true);
     }
+
 }

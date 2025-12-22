@@ -25,7 +25,7 @@ public class DrivetrainConstants {
     /**
      * the distance in which the auto should transfer from PP path to DriveToPose.
      */
-    public static final double DISTANCE_TO_STOP_PP = 2; //m
+    public static final double DISTANCE_TO_STOP_PP = 0.751; //m
 
     public static class DriveToPose{
         /**
@@ -83,7 +83,7 @@ public class DrivetrainConstants {
         /**
          * the distance within the robot is considered at the goal
          */
-        public static final double POSE_TOLERANCE = 0.01;
+        public static final double POSE_TOLERANCE = 0.03; //m
         /**
          * the angle within the robot is considered at the goal
          */

@@ -58,24 +58,25 @@ public class RobotContainer
         SequentialCommandGroup auto = new SequentialCommandGroup();
 
         for (PathPlannerPath p: paths){
-            Rotation2d finalRotation = p.getAllPathPoints().getLast().rotationTarget.rotation();
-            Translation2d finalTranslation = p.getAllPathPoints().getLast().position;
+            Rotation2d finalRotation = p.getAllPathPoints().get(p.numPoints()-1).rotationTarget.rotation();
+            final Translation2d finalTranslation = p.getAllPathPoints().get(p.numPoints()-1).position;
             Pose2d finalPose = new Pose2d(finalTranslation.getX(), finalTranslation.getY(), finalRotation);
 
-
-
-            Logger.recordOutput("auto/isCloseEnough" + p.name, (BooleanSupplier) () -> drivetrain.getEstimatedPosition().getTranslation().getDistance(finalTranslation)<
+            var pathCommand = AutoBuilder.followPath(p).until(() -> drivetrain.getEstimatedPosition().getTranslation().getDistance(finalTranslation)<
                     DrivetrainConstants.DISTANCE_TO_STOP_PP);
-            Logger.recordOutput("auto/isCloseEnoughDis" + p.name, (DoubleSupplier) ()-> drivetrain.getEstimatedPosition().getTranslation().getDistance(finalTranslation));
-            Logger.recordOutput("auto/finalTranslation" + p.name, finalPose);
 
+            Command pathNig = new ParallelDeadlineGroup(pathCommand, new InstantCommand(() -> {
+                Logger.recordOutput("auto/isCloseEnough" + p.name, (BooleanSupplier) () -> drivetrain.getEstimatedPosition().getTranslation().getDistance(finalTranslation)<
+                        DrivetrainConstants.DISTANCE_TO_STOP_PP);
+                Logger.recordOutput("auto/isCloseEnoughDis" + p.name, (DoubleSupplier) ()-> drivetrain.getEstimatedPosition().getTranslation().getDistance(finalTranslation));
+                Logger.recordOutput("auto/finalTranslation" + p.name, finalPose);
+            }).repeatedly());
 
-            auto.addCommands(AutoBuilder.followPath(p).until(() -> drivetrain.getEstimatedPosition().getTranslation().getDistance(finalTranslation)<
-                    DrivetrainConstants.DISTANCE_TO_STOP_PP));
+            auto.addCommands(pathNig);
             auto.addCommands((new DriveToPoseCommand(drivetrain, ()-> finalPose)));
 
-
         }
+
         return auto;
 
     }
@@ -89,6 +90,14 @@ public class RobotContainer
             PathPlannerPath b = PathPlannerPath.fromPathFile("b");
             PathPlannerPath[] paths = {a,b};
             auto = createSequenceWithDriveCommand(paths);
+
+            auto = auto.beforeStarting(new SequentialCommandGroup(
+                    new InstantCommand(() -> {
+                        drivetrain.drive(new ChassisSpeeds(2,0,0));
+                    }), new WaitCommand(3), new InstantCommand(() -> {drivetrain.drive(new ChassisSpeeds());
+                drivetrain.reset(a.getStartingHolonomicPose().get());}
+            ), new WaitCommand(1)
+            ));
 
         } catch (IOException | ParseException e){
             e.getStackTrace();
