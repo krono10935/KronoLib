@@ -2,6 +2,7 @@ package frc.robot.subsystems.drivetrain.module;
 
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.subsystems.drivetrain.module.constants.SwerveModuleConstantsRecord;
 import io.github.captainsoccer.basicmotor.ctre.talonfx.BasicTalonFX;
 import io.github.captainsoccer.basicmotor.sim.motor.BasicMotorSim;
 import org.littletonrobotics.junction.Logger;
@@ -22,12 +23,12 @@ public class SwerveModuleBasic extends SwerveModuleIO {
 
     private final CANcoder canCoder;
 
-    public SwerveModuleBasic(SwerveModuleConstants constants){
+    public SwerveModuleBasic(SwerveModuleConstantsRecord constants){
         super(constants);
 
         if (RobotBase.isReal()) {
-            drivingMotor = new BasicTalonFX(constants.DRIVING_CONFIG);
-            steeringMotor = new BasicTalonFX(constants.STEERING_CONFIG);
+            drivingMotor = new BasicTalonFX(constants.drivingConfig());
+            steeringMotor = new BasicTalonFX(constants.steeringConfig());
 
             canCoder = createCANcoder(constants);
             steeringMotor.resetEncoder(canCoder.getPosition().getValueAsDouble());
@@ -39,8 +40,8 @@ public class SwerveModuleBasic extends SwerveModuleIO {
 
         }
         else{
-            drivingMotor = new BasicMotorSim(constants.DRIVING_CONFIG);
-            steeringMotor = new BasicMotorSim(constants.STEERING_CONFIG);
+            drivingMotor = new BasicMotorSim(constants.drivingConfig());
+            steeringMotor = new BasicMotorSim(constants.steeringConfig());
 
             canCoder = null;
         }
@@ -86,12 +87,12 @@ public class SwerveModuleBasic extends SwerveModuleIO {
      * @param constants
      * @return A configured CANCoder for the module
      */
-    private static CANcoder createCANcoder(SwerveModuleConstants constants){
-        CANcoder encoder = new CANcoder(constants.CAN_CODER_ID);
+    private static CANcoder createCANcoder(SwerveModuleConstantsRecord constants){
+        CANcoder encoder = new CANcoder(constants.canCoderID());
         var config = new CANcoderConfiguration();
         config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
         config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-        config.MagnetSensor.MagnetOffset = -constants.ZERO_OFFSET;
+        config.MagnetSensor.MagnetOffset = -constants.zeroOffset();
 
         encoder.getConfigurator().apply(config);
         return encoder;

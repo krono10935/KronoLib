@@ -9,16 +9,17 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.drivetrain.Drivetrain;
-import frc.robot.subsystems.drivetrain.DrivetrainConstants;
+import frc.robot.subsystems.drivetrain.module.chasisConfigs.ChasisConstants;
+
 
 public class DriveCommand extends Command {
   private final Drivetrain drivetrain;
   private final CommandXboxController controller;
 
-  private static final double MAX_LINEAR_SPEED = DrivetrainConstants.MAX_LINEAR_SPEED;
-  private static final double MIN_LINEAR_SPEED = DrivetrainConstants.MIN_LINEAR_SPEED;
-  private static final double MAX_ANGULAR_SPEED = DrivetrainConstants.MAX_ANGULAR_SPEED;
-  private static final double MIN_ANGULAR_SPEED = DrivetrainConstants.MIN_ANGULAR_SPEED;
+  private static double MAX_LINEAR_SPEED ;
+  private static double MIN_LINEAR_SPEED ;
+  private static double MAX_ANGULAR_SPEED;
+  private static double MIN_ANGULAR_SPEED;
   
 
   private static final double DEADBAND = 0.1;
@@ -27,10 +28,15 @@ public class DriveCommand extends Command {
     this.drivetrain = drivetrain;
     this.controller = controller;
     addRequirements(drivetrain);
+
+    MAX_LINEAR_SPEED = drivetrain.getConstants().getSpeedConfig().maxLinearSpeed();
+    MIN_LINEAR_SPEED = drivetrain.getConstants().getSpeedConfig().minLinearSpeed();
+    MAX_ANGULAR_SPEED = drivetrain.getConstants().getMAX_ANGULAR_SPEED();
+    MIN_ANGULAR_SPEED = drivetrain.getConstants().getMIN_ANGULAR_SPEED();
   }
 
   private Rotation2d angleFieldRelative(){
-      return DrivetrainConstants.shouldFlipPath()?
+      return ChasisConstants.shouldFlipPath()?
               drivetrain.getGyroAngle():drivetrain.getGyroAngle().rotateBy(Rotation2d.k180deg) ;
   }
 

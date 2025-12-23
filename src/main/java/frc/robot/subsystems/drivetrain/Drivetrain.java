@@ -16,20 +16,16 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants;
 import frc.robot.PPController;
-import frc.robot.subsystems.drivetrain.gyro.GyroIO;
-import frc.robot.subsystems.drivetrain.gyro.GyroIOPigeon;
-import frc.robot.subsystems.drivetrain.gyro.GyroIOSim;
 import frc.robot.subsystems.drivetrain.module.SwerveModuleBasic;
-import frc.robot.subsystems.drivetrain.module.SwerveModuleConstants;
 import frc.robot.subsystems.drivetrain.module.SwerveModuleIO;
+import frc.robot.subsystems.drivetrain.module.chasisConfigs.ChasisConstants;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
@@ -44,8 +40,8 @@ public class Drivetrain extends SubsystemBase {
         public ChassisSpeeds speeds = new ChassisSpeeds();
         public SwerveModuleState[] moduleStates = new SwerveModuleState[4];
     }
+    private final ChasisConstants constants;
 
-    private final GyroIO gyroIO;
 
     private final DrivetrainInputsAutoLogged inputs = new DrivetrainInputsAutoLogged();
 
@@ -67,36 +63,32 @@ public class Drivetrain extends SubsystemBase {
 
 
 
-    public Drivetrain(Supplier<Double> batteryVoltageSupplier) {
-        if(RobotBase.isReal()) {
-            gyroIO = new GyroIOPigeon(DrivetrainConstants.PIGEON_ID);
-            this.batteryVoltageSupplier = batteryVoltageSupplier;
-        }
-        else {
-            gyroIO = new GyroIOSim(this::getChassisSpeeds);
-            this.batteryVoltageSupplier = RobotController::getBatteryVoltage;
-        }
+    public Drivetrain(Supplier<Double> batteryVoltageSupplier, ChasisConstants constants) {
+
+        this.batteryVoltageSupplier= batteryVoltageSupplier;
+        this.constants = constants;
 
         for(int i=0;i<4;i++){
-            io[i] = new SwerveModuleBasic(SwerveModuleConstants.values()[i]);
+            io[i] = new SwerveModuleBasic(constants.getModules()[i]);
             inputs.moduleStates[i] = io[i].getState();
             modulePositions[i] = io[i].getPosition();
         }
 
 
-
+        //TODO: add max steer speed
         setpointGenerator = new SwerveSetpointGenerator(
-                DrivetrainConstants.ROBOT_CONFIG,
-                SwerveModuleConstants.STEER_MAX_SPEED
+                constants.getRobotConfig(),
+                0
+
         );
 
         previousSetpoint = new SwerveSetpoint(new ChassisSpeeds(), inputs.moduleStates,
                 DriveFeedforwards.zeros(inputs.moduleStates.length));
 
-        kinematics = new SwerveDriveKinematics(SwerveModuleConstants.getModuleTranslations());
+        kinematics = new SwerveDriveKinematics(constants.getRobotConfig().moduleLocations);
 
         poseEstimator = new SwerveDrivePoseEstimator(kinematics, getGyroAngle(), modulePositions,
-                DrivetrainConstants.startPose2d);
+                Constants.STARTING_POSE);
 
         configPathPlanner();
 
@@ -117,6 +109,7 @@ public class Drivetrain extends SubsystemBase {
     }
 
 
+
     private void configPathPlanner(){
 
         // Configure AutoBuilder last
@@ -126,10 +119,10 @@ public class Drivetrain extends SubsystemBase {
                 this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 (speeds, feedforwards) -> drive(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
                 new PPController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                        DrivetrainConstants.PID_CONSTANTS, DrivetrainConstants.ANGULAR_PID_CONSTANTS // Rotation PID constants
+                        constants.getPpConfig().PID_CONSTANTS(), constants.getPpConfig().ANGULAR_PID_CONSTANTS() // Rotation PID constants
                 ),
-                DrivetrainConstants.ROBOT_CONFIG, // The robot configuration
-                DrivetrainConstants::shouldFlipPath,
+                constants.getRobotConfig(), // The robot configuration
+                ChasisConstants::shouldFlipPath,
                 this // Reference to this subsystem to set requirements
         );
 
@@ -155,7 +148,7 @@ public class Drivetrain extends SubsystemBase {
      */
     public void drive(ChassisSpeeds speeds) {
         previousSetpoint = setpointGenerator.generateSetpoint(previousSetpoint, speeds, null,
-                DrivetrainConstants.LOOP_TIME_SECONDS, batteryVoltageSupplier.get());
+                constants.getPpConfig().LOOP_TIME_SECONDS(), batteryVoltageSupplier.get());
 
         for (int i = 0; i < 4; i++){
             var targetSpeed = previousSetpoint.moduleStates()[i];
@@ -250,7 +243,7 @@ public class Drivetrain extends SubsystemBase {
 
     @Override
     public void periodic() {
-        inputs.gyroAngle = gyroIO.update();
+        inputs.gyroAngle = constants.getGyro().update();
 
         for (int i=0;i<4;i++){
             io[i].update();
@@ -262,7 +255,7 @@ public class Drivetrain extends SubsystemBase {
 
         poseEstimator.update(getGyroAngle(), modulePositions);
 
-        gyroIO.getEstimatedPosition().ifPresent((
+        constants.getGyro().getEstimatedPosition().ifPresent((
                 pose -> poseEstimator.addVisionMeasurement(pose.pose(), Timer.getTimestamp(), pose.stdDevs())));
 
         Logger.processInputs("drivetrain", inputs);
@@ -279,7 +272,7 @@ public class Drivetrain extends SubsystemBase {
      * @param newPose new pose of the robot
      */
     public void reset(Pose2d newPose){
-        gyroIO.reset(newPose);
+        constants.getGyro().reset(newPose);
         poseEstimator.resetPosition(newPose.getRotation(), modulePositions, newPose);
     }
 
@@ -338,6 +331,10 @@ public class Drivetrain extends SubsystemBase {
             io[i].setTargetStateVoltages(targetSpeeds[i]);
         }
         Logger.recordOutput("drivetrain/swerve/target states sysid", targetSpeeds);
+    }
+
+    public ChasisConstants getConstants() {
+        return constants;
     }
 }
 

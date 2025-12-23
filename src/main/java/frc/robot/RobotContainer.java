@@ -21,7 +21,7 @@ public class RobotContainer
     private CommandXboxController cmd;
 
     private static RobotContainer instance;
-    public final Drivetrain drivetrain;
+
 
 
     public static RobotContainer getInstance(){
@@ -33,13 +33,7 @@ public class RobotContainer
 
     private RobotContainer()
     {
-        drivetrain = new Drivetrain(ConduitApi.getInstance()::getPDPVoltage);
-        cmd = new CommandXboxController(0);
-        cmd.b().whileTrue(new RunCommand(drivetrain::stop));
 
-        drivetrain.setDefaultCommand(new DriveCommand(drivetrain,cmd));
-
-        configureBindings();
     }
 
     private void configureBindings() {
@@ -58,7 +52,7 @@ public class RobotContainer
 //        controller.x().whileTrue(
 //            swerveSysID.sysIdDynamicDrive(Direction.kReverse)
 //        );
-        cmd.a().onTrue(new InstantCommand(() -> drivetrain.reset(new Pose2d())));
+
     }
     
     
