@@ -16,11 +16,12 @@ import java.util.function.Supplier;
 
 public class LedManager {
 
-    public record LedState(String pattern, Color mainColor, Color secondaryColor, double hz, int start, int end){
+    public record LedState(String pattern, Color mainColor, Color secondaryColor, double hz, int ledLineID, int start, int end){
         public LedState(LedPattern pattern, Color mainColor, Color secondaryColor, double hz, LedLocation location){
-            this(pattern.toString(), mainColor, secondaryColor, hz,location.start, location.end);
+            this(pattern.toString(), mainColor, secondaryColor, hz, location.ledLineID,  location.start, location.end);
         }
     }
+    private final NetworkTableEntry ledLineIDEntry;
     private final NetworkTableEntry patternEntry;
 
     private final NetworkTableEntry mainColorEntry;
@@ -37,6 +38,9 @@ public class LedManager {
         var nt = NetworkTableInstance.getDefault();
 
         var table = nt.getTable("Led");
+
+
+        ledLineIDEntry = table.getEntry("id");
 
         patternEntry = table.getEntry("pattern");
 
@@ -57,6 +61,7 @@ public class LedManager {
      * @param state the led state to activate for the robot
      */
     public void setColors(LedState state){
+        ledLineIDEntry.setInteger(state.ledLineID);
         patternEntry.setString(state.pattern);
         mainColorEntry.setDoubleArray(convertColorToDoubleArr(state.mainColor));
         secondaryColorEntry.setDoubleArray(convertColorToDoubleArr(state.secondaryColor));
