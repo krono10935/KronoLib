@@ -17,7 +17,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * @param code the error code from the subsystem
  * @param message a message connected to the error
  * @param shouldDisplayError boolean supplier trigger for the error
- * @param onDisplayAlert a runnable to run once the supplier returns true
+ * @param onTrue a runnable to run once the supplier returns true
+ * @param onFalse a runnable to run once the supplier returns true
  * @param alert an Alert object which is turned on once the trigger activates
  */
 public record ErrorMessage(
@@ -34,7 +35,8 @@ public record ErrorMessage(
      * @param code the error code from the subsystem
      * @param message a message connected to the error
      * @param shouldDisplayError boolean supplier trigger for the error
-     * @param onDisplayAlert a runnable to run once the supplier returns true
+     * @param onTrue a runnable to run once the supplier returns true
+     * @param onFalse a runnable to run once the supplier returns true
      */
     public ErrorMessage(Subsystem subsystem, int code, String message,
      BooleanSupplier shouldDisplayError, Runnable onTrue, Runnable onFalse) {
@@ -44,16 +46,13 @@ public record ErrorMessage(
             Alert.AlertType.kError
         ));
 
-        new Trigger(shouldDisplayError).onChange(new InstantCommand(() -> {
-            
-            alert.set(shouldDisplayError.getAsBoolean());
+        new Trigger(shouldDisplayError).onTrue(
+                new InstantCommand(() -> alert.set(true))
+                        .andThen(new InstantCommand(() -> onTrue.run())));
 
-            if (shouldDisplayError.getAsBoolean()){
-                onTrue.run();
-            } else {
-                onFalse.run();
-            }
-        }));
+        new Trigger(shouldDisplayError).onFalse(
+                new InstantCommand(() -> alert.set(false))
+                        .andThen(new InstantCommand(() -> onFalse.run())));
     }
 }
 

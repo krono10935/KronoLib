@@ -7,7 +7,6 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.ErrorMessage;
-import frc.lib.ReportError;
 
 public class skebob extends SubsystemBase {
   /** Creates a new skebob. */
