@@ -1,13 +1,12 @@
 package frc.robot.util;
 
+import edu.wpi.first.wpilibj.DriverStation;
+
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Scanner;
 
 public class ModeFileHandling {
-
+    private static boolean wasFmsChecked = false;
+    private static boolean fmsAttached;
     private static final String MODE_FILE_PATH = "/home/lvuser/isComp.txt";
 
     /**
@@ -28,5 +27,18 @@ public class ModeFileHandling {
 
     }
 
+    /**
+     *
+     * @return if robot should switch to pit mode
+     */
+    public static boolean shouldSwitchToPitMode() {
+
+        if(!wasFmsChecked){
+            fmsAttached = DriverStation.isFMSAttached();
+            wasFmsChecked = true;
+        }
+        //TODO: set actual check
+        return !fmsAttached && true;
+    }
 
 }

@@ -24,9 +24,7 @@ public class Robot extends LoggedRobot
 {
     private Command autonomousCommand;
 
-
-
-
+    private boolean isPitMode;
     public Robot()
     {
 
@@ -54,7 +52,10 @@ public class Robot extends LoggedRobot
             Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
 
             // Publish data to NetworkTables only if not in comp mode
-            if(!ModeFileHandling.isCompMode()) Logger.addDataReceiver(new NT4Publisher());
+            if(!ModeFileHandling.isCompMode()) {
+                Logger.addDataReceiver(new NT4Publisher());
+                isPitMode =  true;
+            }else isPitMode = false;
 
         } else {
             Logger.addDataReceiver(new NT4Publisher());
@@ -80,7 +81,9 @@ public class Robot extends LoggedRobot
     
     @Override
     public void disabledPeriodic() {
-        if(!DriverStation.isFMSAttached()&&RobotContainer.getInstance().shouldSwitchMode() ){
+
+        //Check is should switch to pit mode
+        if(!isPitMode && ModeFileHandling.shouldSwitchToPitMode()){
             ModeFileHandling.switchToPitMode();
             throw new RuntimeException("Switched to pit mode");
         }

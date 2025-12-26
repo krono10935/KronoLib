@@ -37,12 +37,5 @@ public class RobotContainer
         return Commands.print("No autonomous command configured");
     }
 
-    /**
-     * Checks if the robot should switch modes
-     * @return true if the robot should switch modes, false otherwise
-     */
-    public boolean shouldSwitchMode() {
-        //placeHolder
-        return true;
-    }
+
 }
