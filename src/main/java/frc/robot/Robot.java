@@ -77,7 +77,7 @@ public class Robot extends LoggedRobot
     @Override
     public void disabledPeriodic() {
 
-        //Check is should switch to pit mode
+        //Check if should switch to pit mode
         if(!isPitMode && ModeFileHandling.shouldSwitchToPitMode()){
             ModeFileHandling.switchToPitMode();
             throw new RuntimeException("Switched to pit mode");
