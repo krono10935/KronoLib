@@ -8,39 +8,32 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-<<<<<<< HEAD
-<<<<<<< HEAD
+
+
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommand;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import org.littletonrobotics.conduit.ConduitApi;
-=======
-import frc.robot.subsystems.skebob;
-=======
->>>>>>> parent of 2576df1 (Merge pull request #6 from krono10935/ErrorHandling)
 
->>>>>>> origin/main
 
 
 public class RobotContainer
 {
-<<<<<<< HEAD
-<<<<<<< HEAD
+
     private CommandXboxController cmd;
-=======
+
     private static RobotContainer instance;
-=======
-    private static  RobotContainer instance;
->>>>>>> parent of 2576df1 (Merge pull request #6 from krono10935/ErrorHandling)
+
+
     private RobotContainer()
     {
         configureBindings();
     }
->>>>>>> origin/main
 
-    private static RobotContainer instance;
+
+
     public final Drivetrain drivetrain;
 
 
@@ -51,16 +44,7 @@ public class RobotContainer
         return instance;
     }
 
-    private RobotContainer()
-    {
-        drivetrain = new Drivetrain(ConduitApi.getInstance()::getPDPVoltage);
-        cmd = new CommandXboxController(0);
-        cmd.b().whileTrue(new RunCommand(drivetrain::stop));
 
-        drivetrain.setDefaultCommand(new DriveCommand(drivetrain,cmd));
-
-        configureBindings();
-    }
 
     private void configureBindings() {
         //        controller.a().whileTrue(

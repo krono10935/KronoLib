@@ -30,15 +30,8 @@ public class Robot extends LoggedRobot
         if (isReal()) {
             Logger.addDataReceiver(new WPILOGWriter("u/logs/logging")); // Log to a USB stick ("/U/logs")
             Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-<<<<<<< HEAD
         }else{
-=======
-        } else {
-<<<<<<< HEAD
-            // Save outputs to a new log
->>>>>>> origin/main
-=======
->>>>>>> parent of 2576df1 (Merge pull request #6 from krono10935/ErrorHandling)
+
             Logger.addDataReceiver(new NT4Publisher());
         }
 
