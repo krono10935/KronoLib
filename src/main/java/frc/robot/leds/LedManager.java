@@ -13,9 +13,18 @@ import java.util.function.Supplier;
  * Manages the robot LED state by publishing it to NetworkTables.
  * <p>
  */
-
 public class LedManager {
 
+    /**
+     * Represents a given ledstate which the leds should have (position, colors, frequency, and pattern)
+     * @param pattern
+     * @param mainColor
+     * @param secondaryColor
+     * @param hz
+     * @param ledLineID
+     * @param start
+     * @param end
+     */
     public record LedState(String pattern, Color mainColor, Color secondaryColor, double hz, int ledLineID, int start, int end){
         public LedState(LedPattern pattern, Color mainColor, Color secondaryColor, double hz, LedLocation location){
             this(pattern.toString(), mainColor, secondaryColor, hz, location.ledLineID,  location.start, location.end);
