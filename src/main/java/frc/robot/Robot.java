@@ -7,22 +7,19 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.utils.ModeFileHandling;
 import io.github.captainsoccer.basicmotor.motorManager.MotorManager;
-import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
-import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 
 public class Robot extends LoggedRobot
 {
     private Command autonomousCommand;
-    
 
-
-
+    private boolean isPitMode;
     public Robot()
     {
 
@@ -46,8 +43,15 @@ public class Robot extends LoggedRobot
         Logger.recordMetadata("ProjectName", "*GENERIC_ROBOT_PROJECT*"); // Set a metadata value
 
         if (isReal()) {
+
             Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
-            Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+
+            // Publish data to NetworkTables only if not in comp mode
+            if(!ModeFileHandling.isCompMode()) {
+                Logger.addDataReceiver(new NT4Publisher());
+                isPitMode =  true;
+            }else isPitMode = false;
+
         } else {
             // Save outputs to a new log
             Logger.addDataReceiver(new NT4Publisher());
@@ -63,6 +67,7 @@ public class Robot extends LoggedRobot
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
         MotorManager.getInstance().periodic(); // must run AFTER CommandScheduler
+
     }
     
     
@@ -71,7 +76,14 @@ public class Robot extends LoggedRobot
     
     
     @Override
-    public void disabledPeriodic() {}
+    public void disabledPeriodic() {
+
+        //Check if should switch to pit mode
+        if(!isPitMode && ModeFileHandling.shouldSwitchToPitMode()){
+            ModeFileHandling.switchToPitMode();
+            throw new RuntimeException("Switched to pit mode");
+        }
+    }
     
     
     @Override
@@ -129,4 +141,8 @@ public class Robot extends LoggedRobot
     
     @Override
     public void testExit() {}
+
+
+
+
 }
