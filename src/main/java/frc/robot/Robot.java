@@ -5,6 +5,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -53,7 +54,7 @@ public class Robot extends LoggedRobot
             Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
 
             // Publish data to NetworkTables only if not in comp mode
-            if(ModeFileHandling.isPitMode()) Logger.addDataReceiver(new NT4Publisher());
+            if(!ModeFileHandling.isCompMode()) Logger.addDataReceiver(new NT4Publisher());
 
         } else {
             Logger.addDataReceiver(new NT4Publisher());
@@ -79,13 +80,9 @@ public class Robot extends LoggedRobot
     
     @Override
     public void disabledPeriodic() {
-        if(RobotContainer.getInstance().shouldSwitchMode() ){
-            if(ModeFileHandling.isPitMode()){
-                ModeFileHandling.switchToComp();
-            }
-            else{
-                ModeFileHandling.switchToPit();
-            }
+        if(!DriverStation.isFMSAttached()&&RobotContainer.getInstance().shouldSwitchMode() ){
+            ModeFileHandling.switchToPitMode();
+            throw new RuntimeException("Switched to pit mode");
         }
     }
     

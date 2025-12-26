@@ -8,34 +8,25 @@ import java.util.Scanner;
 
 public class ModeFileHandling {
 
-    private static final String MODE_FILE_PATH = "/home/lvuser/isPit.txt";
+    private static final String MODE_FILE_PATH = "/home/lvuser/isComp.txt";
 
     /**
      *
-     * @return if the file for pit mode exists
+     * @return if the file for comp mode exists
      */
-    public static boolean isPitMode() {
+    public static boolean isCompMode() {
         File file = new File(MODE_FILE_PATH);
         return file.exists();
     }
 
     /**
-     * deletes the pit mode file
+     * deletes the comp mode file
      */
-    public static void switchToComp(){
+    public static void switchToPitMode() {
         File file = new File(MODE_FILE_PATH);
         file.delete();
+
     }
 
-    /**
-     * creates the pit mode file
-     */
-    public static void switchToPit(){
-        File file = new File(MODE_FILE_PATH);
-        try{
-            file.createNewFile();
-        } catch (IOException e){
-            e.printStackTrace();
-        }
-    }
+
 }

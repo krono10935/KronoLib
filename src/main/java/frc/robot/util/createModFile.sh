@@ -1,4 +1,4 @@
 #!/bin/bash
 
-touch "/home/lvuser/isPit.txt"
+touch "/home/lvuser/isComp.txt"
 

@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 public class RobotContainer
 {
 
-    private Supplier<Boolean> shouldSwitchMode;
+
 
     private static  RobotContainer instance;
     private RobotContainer()
@@ -42,6 +42,7 @@ public class RobotContainer
      * @return true if the robot should switch modes, false otherwise
      */
     public boolean shouldSwitchMode() {
-        return shouldSwitchMode.get();
+        //placeHolder
+        return true;
     }
 }
