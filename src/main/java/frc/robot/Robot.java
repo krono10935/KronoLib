@@ -34,8 +34,11 @@ public class Robot extends LoggedRobot
         }else{
 =======
         } else {
+<<<<<<< HEAD
             // Save outputs to a new log
 >>>>>>> origin/main
+=======
+>>>>>>> parent of 2576df1 (Merge pull request #6 from krono10935/ErrorHandling)
             Logger.addDataReceiver(new NT4Publisher());
         }
 
