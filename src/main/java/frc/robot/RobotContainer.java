@@ -8,17 +8,30 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+<<<<<<< HEAD
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommand;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import org.littletonrobotics.conduit.ConduitApi;
+=======
+import frc.robot.subsystems.skebob;
+
+>>>>>>> origin/main
 
 
 public class RobotContainer
 {
+<<<<<<< HEAD
     private CommandXboxController cmd;
+=======
+    private static RobotContainer instance;
+    private RobotContainer()
+    {
+        configureBindings();
+    }
+>>>>>>> origin/main
 
     private static RobotContainer instance;
     public final Drivetrain drivetrain;
