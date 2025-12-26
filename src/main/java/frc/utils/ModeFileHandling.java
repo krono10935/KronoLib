@@ -9,7 +9,14 @@ public class ModeFileHandling {
     private static boolean fmsAttached;
     private static final String MODE_FILE_PATH = "/home/lvuser/isComp.txt";
 
-
+    /**
+     *
+     * @return if file for comp mode exists
+     */
+    public static boolean isCompMode(){
+        File file = new File(MODE_FILE_PATH);
+        return file.exists();
+    }
     /**
      * deletes the comp mode file
      */
