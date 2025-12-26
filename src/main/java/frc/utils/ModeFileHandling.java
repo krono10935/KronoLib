@@ -9,6 +9,7 @@ public class ModeFileHandling {
     private static boolean fmsAttached;
     private static final String MODE_FILE_PATH = "/home/lvuser/isComp.txt";
 
+
     /**
      *
      * @return if file for comp mode exists
@@ -36,7 +37,7 @@ public class ModeFileHandling {
             fmsAttached = DriverStation.isFMSAttached();
             wasFmsChecked = true;
         }
-        //TODO: set actual check
+        //TODO: set actual check for pit mode
         return !fmsAttached && true;
     }
 
