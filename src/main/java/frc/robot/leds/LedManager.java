@@ -17,30 +17,50 @@ public class LedManager {
 
     /**
      * Represents a given ledstate which the leds should have (position, colors, frequency, and pattern)
-     * @param pattern
-     * @param mainColor
-     * @param secondaryColor
-     * @param hz
-     * @param ledLineID
-     * @param start
-     * @param end
+     * @param pattern  pattern to use on the given leds
+     * @param mainColor primary color of the pattern
+     * @param secondaryColor secondary color of the pattern
+     * @param hz frequency of the pattern
+     * @param ledLineID which ledLine to display the pattern on
+     * @param start where to start the pattern on that ledline
+     * @param end where to end the pattern on that ledline
      */
     public record LedState(String pattern, Color mainColor, Color secondaryColor, double hz, int ledLineID, int start, int end){
         public LedState(LedPattern pattern, Color mainColor, Color secondaryColor, double hz, LedLocation location){
             this(pattern.toString(), mainColor, secondaryColor, hz, location.ledLineID,  location.start, location.end);
         }
     }
-    private final NetworkTableEntry ledLineIDEntry;
-    private final NetworkTableEntry patternEntry;
 
+    /**
+     * The Network Tables entry for the ledlineID
+     */
+    private final NetworkTableEntry ledLineIDEntry;
+    /**
+     * The Network Tables entry for the pattern
+     */
+    private final NetworkTableEntry patternEntry;
+    /**
+     * The Network Tables entry for the main color
+     */
     private final NetworkTableEntry mainColorEntry;
 
+    /**
+     * The Network Tables entry for the secondary color
+     */
     private final NetworkTableEntry secondaryColorEntry;
 
+    /**
+     * The Network Tables entry for the frequency of the pattern
+     */
     private final NetworkTableEntry hzEntry;
 
+    /**
+     * The Network Tables entry for the range in which the leds will have the pattern
+     */
     private final NetworkTableEntry rangeEntry;
-
+    /**
+     * Updates whether or a change has been made to the entry
+     */
     private final NetworkTableEntry hasChangeEntry;
 
     public LedManager() {
@@ -67,6 +87,8 @@ public class LedManager {
 
     /**
      * publishes the colors to networkTable
+     * including the location of the leds to set, the pattern chosen, the colors to use for the pattern
+     * and updates the entry to say that a new command for the leds has been chosen.
      * @param state the led state to activate for the robot
      */
     public void setColors(LedState state){

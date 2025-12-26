@@ -8,15 +8,26 @@ public enum LedLocation{
     ARM(1,1,2),
     END_EFFECTOR(2,2,3);
 
+    /**
+     * Ledline to control
+     */
     public final int ledLineID;
+
+    /**
+     * Starting led for the pattern on the ledline
+     */
     public final int start;
+
+    /**
+     * Last led in the pattern for the ledline
+     */
     public final int end;
 
     /**
      * Construct a Ledlocation enum.
-     * @param ledLineID
-     * @param start
-     * @param end
+     * @param ledLineID Ledline id to access
+     * @param start Start position on the ledline
+     * @param end End position on the ledline
      */
     LedLocation(int ledLineID,int start, int end){
         this.ledLineID = ledLineID;
