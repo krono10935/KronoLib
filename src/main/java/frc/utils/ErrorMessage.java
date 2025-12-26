@@ -18,7 +18,6 @@ public class ErrorMessage{
     private final Alert alert;
     /**
      * @param subsystem the subsystem which is sending the error
-     * @param code the error code from the subsystem
      * @param message a message connected to the error
      * @param shouldDisplayError boolean supplier trigger for the error
      * @param onTrue a runnable to run once the supplier returns true
@@ -28,7 +27,7 @@ public class ErrorMessage{
      BooleanSupplier shouldDisplayError, Runnable onTrue, Runnable onFalse) {
 
         this.alert = new Alert(subsystem.getName(),
-                "Error in " + subsystem.getName() + " | Code: " + code + " | Message: " + message,
+                "Error in " + subsystem.getName() + " | Message: " + message,
                 Alert.AlertType.kError
         );
 
