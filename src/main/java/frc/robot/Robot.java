@@ -23,7 +23,7 @@ import frc.robot.util.ModeFileHandling.*;
 public class Robot extends LoggedRobot
 {
     private Command autonomousCommand;
-    private RobotMode mode;
+
 
 
 
@@ -48,13 +48,13 @@ public class Robot extends LoggedRobot
         }
 
         Logger.recordMetadata("ProjectName", "*GENERIC_ROBOT_PROJECT*"); // Set a metadata value
-        mode = ModeFileHandling.getModeFromFile();
+
         if (isReal()) {
 
             Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
 
             // Publish data to NetworkTables only if not in comp mode
-            if(mode != RobotMode.COMP) Logger.addDataReceiver(new NT4Publisher());
+            if(ModeFileHandling.isPitMode()) Logger.addDataReceiver(new NT4Publisher());
 
         } else {
             Logger.addDataReceiver(new NT4Publisher());
@@ -71,8 +71,12 @@ public class Robot extends LoggedRobot
         CommandScheduler.getInstance().run();
         MotorManager.getInstance().periodic(); // must run AFTER CommandScheduler
         if(RobotContainer.getInstance().shouldSwitchMode()){
-            mode = ModeFileHandling.getModeFromFile();
-            ModeFileHandling.handleModeSwitch(mode);
+            if(ModeFileHandling.isPitMode()){
+                ModeFileHandling.switchToComp();
+            }
+            else{
+                ModeFileHandling.switchToPit();
+            }
         }
     }
     
