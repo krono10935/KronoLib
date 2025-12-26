@@ -16,7 +16,6 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-import frc.robot.util.ModeFileHandling.RobotMode;
 import frc.robot.util.ModeFileHandling.*;
 
 
@@ -70,14 +69,7 @@ public class Robot extends LoggedRobot
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
         MotorManager.getInstance().periodic(); // must run AFTER CommandScheduler
-        if(RobotContainer.getInstance().shouldSwitchMode()){
-            if(ModeFileHandling.isPitMode()){
-                ModeFileHandling.switchToComp();
-            }
-            else{
-                ModeFileHandling.switchToPit();
-            }
-        }
+
     }
     
     
@@ -86,7 +78,16 @@ public class Robot extends LoggedRobot
     
     
     @Override
-    public void disabledPeriodic() {}
+    public void disabledPeriodic() {
+        if(RobotContainer.getInstance().shouldSwitchMode() ){
+            if(ModeFileHandling.isPitMode()){
+                ModeFileHandling.switchToComp();
+            }
+            else{
+                ModeFileHandling.switchToPit();
+            }
+        }
+    }
     
     
     @Override
