@@ -13,14 +13,19 @@ import frc.robot.subsystems.skebob;
 
 public class RobotContainer
 {
-    private final skebob m_skebob;
-    public RobotContainer()
+    private static RobotContainer instance;
+    private RobotContainer()
     {
-        m_skebob = new skebob();
         configureBindings();
     }
-    
-    
+
+    public static RobotContainer getInstance() {
+        if(instance == null){
+            instance = new RobotContainer();
+        }
+        return instance;
+    }
+
     private void configureBindings() {}
     
     
