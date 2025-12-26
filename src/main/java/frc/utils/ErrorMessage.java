@@ -15,13 +15,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * Represent an Error message and the relevant action connected to it
  */
 public class ErrorMessage{
-    private Subsystem subsystem;
-    private int code;
-    private String message;
-    private BooleanSupplier shouldDisplayError;
-    private Runnable onTrue;
-    private Runnable onFalse;
-    private Alert alert;
+    private final Alert alert;
     /**
      * @param subsystem the subsystem which is sending the error
      * @param code the error code from the subsystem
@@ -33,23 +27,17 @@ public class ErrorMessage{
     public ErrorMessage(Subsystem subsystem, int code, String message,
      BooleanSupplier shouldDisplayError, Runnable onTrue, Runnable onFalse) {
 
-        this.subsystem = subsystem;
-        this.code = code;
-        this.message = message;
-        this.shouldDisplayError = shouldDisplayError;
-        this.onTrue = onTrue;
-        this.onFalse = onFalse;
-        this.alert = new Alert(
+        this.alert = new Alert(subsystem.getName(),
                 "Error in " + subsystem.getName() + " | Code: " + code + " | Message: " + message,
                 Alert.AlertType.kError
         );
 
         new Trigger(shouldDisplayError).onTrue(
                 new InstantCommand(() -> alert.set(true))
-                        .andThen(new InstantCommand(() -> onTrue.run())))
+                        .andThen(new InstantCommand(onTrue)))
                 .onFalse(
                 new InstantCommand(() -> alert.set(false))
-                        .andThen(new InstantCommand(() -> onFalse.run())));
+                        .andThen(new InstantCommand(onFalse)));
     }
 }
 
