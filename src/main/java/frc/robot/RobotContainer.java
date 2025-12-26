@@ -8,10 +8,14 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
+import java.util.function.Supplier;
 
 
 public class RobotContainer
 {
+
+    private Supplier<Boolean> shouldSwitchMode;
+
     private static  RobotContainer instance;
     private RobotContainer()
     {
@@ -31,5 +35,13 @@ public class RobotContainer
     public Command getAutonomousCommand()
     {
         return Commands.print("No autonomous command configured");
+    }
+
+    /**
+     * Checks if the robot should switch modes
+     * @return true if the robot should switch modes, false otherwise
+     */
+    public boolean shouldSwitchMode() {
+        return shouldSwitchMode.get();
     }
 }
