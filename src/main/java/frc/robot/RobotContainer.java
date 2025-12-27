@@ -27,8 +27,7 @@ public class RobotContainer
                 new DriveToPoseConstants(
                         drivetrain::getEstimatedPosition,
                         drivetrain::getChassisSpeeds,
-                        drivetrain::drive,
-                        true
+                        drivetrain::drive
                 )
         );
         configureBindings();
