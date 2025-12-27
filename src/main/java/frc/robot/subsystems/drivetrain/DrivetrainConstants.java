@@ -1,4 +1,6 @@
 package frc.robot.subsystems.drivetrain;
+import com.pathplanner.lib.path.DriveToPoseConstants;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -21,83 +23,14 @@ public class DrivetrainConstants {
     public static final double MIN_LINEAR_SPEED = 0.5; // m/s
     public static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / SwerveModuleConstants.FRONT_LEFT.TRANSLATION.getNorm(); // rad/s
     public static final double MIN_ANGULAR_SPEED = MIN_LINEAR_SPEED / SwerveModuleConstants.FRONT_LEFT.TRANSLATION.getNorm(); // rad/s
+    
+    public static final PIDGains LINEAR_PID_GAINS = new PIDGains();
+    public static final PIDGains ANGULAR_PID_GAINS = new PIDGains();
 
-    /**
-     * the distance in which the auto should transfer from PP path to DriveToPose.
-     */
-    public static final double DISTANCE_TO_STOP_PP = 0.751; //m
-
-    public static class DriveToPose{
-        /**
-         * the linear Trapezoid Profile constraints for autonomous
-         */
-        public static final TrapezoidProfile.Constraints LINEAR_AUTO_CONSTRAINTS =
-                new TrapezoidProfile.Constraints(4, 1);
-        /**
-         * the linear Trapezoid Profile constraints for tele-op
-         */
-        public static final TrapezoidProfile.Constraints LINEAR_TELE_CONSTRAINTS =
-                new TrapezoidProfile.Constraints(4, 1);
-        /**
-         * the angle Trapezoid Profile constraints for autonomous
-         */
-        public static final TrapezoidProfile.Constraints ANGLE_AUTO_CONSTRAINTS =
-                new TrapezoidProfile.Constraints(MAX_ANGULAR_SPEED/1.2, Units.degreesToRadians(45));
-        /**
-         * the angle Trapezoid Profile constraints for tele-op
-         */
-        public static final TrapezoidProfile.Constraints ANGLE_TELE_CONSTRAINTS =
-                new TrapezoidProfile.Constraints(MAX_ANGULAR_SPEED/1.2, Units.degreesToRadians(45));
-        /**
-         * linear PID constants
-         */
-        public static final PIDGains LINEAR_PID_GAINS = new PIDGains(1.5,0.002,0);
-        /**
-         * angular PID constants
-         */
-        public static final PIDGains ANGULAR_PID_GAINS = new PIDGains(2,0,0);
-        /**
-         * the minimum distance from the current pose to the goal where we will not scale the velocity
-         */
-        public static final double MIN_DISTANCE_VELOCITY_CORRECTION = 0.02;
-        /**
-         * the minimum velocity the feed forward can get
-         */
-        public static final double MIN_SET_POINT_VELOCITY = 0.5;
-        /**
-         * the distance which above the FF is at 100% and below is 100%-0%.
-         */
-        public static final double FF_MAX_DISTANCE = 0.1;
-        /**
-         * the distance which above the FF is at 0%-100% and below is 0%.
-         */
-        public static final double FF_MIN_DISTANCE = 0.025;
-        /**
-         * the angle which above the FF is at 100% and below is 100%-0%.
-         */
-        public static final double FF_MAX_ANGLE = Units.degreesToRadians(15);
-        /**
-         * the angle which above the FF is at 0%-100% and below is 0%.
-         */
-        public static final double FF_MIN_ANGLE = Units.degreesToRadians(5);
-        /**
-         * the distance within the robot is considered at the goal
-         */
-        public static final double POSE_TOLERANCE = 0.03; //m
-        /**
-         * the angle within the robot is considered at the goal
-         */
-        public static final double ANGLE_TOLERANCE = Units.degreesToRadians(2);
-        /**
-         * the velocity below the robot is considered stopped. if above the velocity the robot will not be considered
-         * inside the tolerance.
-         */
-        public static final double VELOCITY_TOLERANCE = 0.1; //m/s
-        /**
-         * the angular velocity below the robot is considered stopped. if above the angular velocity the robot will not
-         * be considered inside the tolerance.
-         */
-        public static final double ANGULAR_VELOCITY_TOLERANCE =  Units.degreesToRadians(5); //rad/s
+    // DriveToPose constants
+    static {
+        DriveToPoseConstants.ANGULAR_PID_GAINS = new ProfiledPIDController(0,0,0,null);
+        DriveToPoseConstants.DISTANCE_TO_STOP_PP = 0.751; // meters
     }
 
     public static boolean shouldFlipPath(){
