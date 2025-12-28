@@ -3,7 +3,7 @@ package frc.robot.subsystems.drivetrain.module;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import frc.robot.subsystems.drivetrain.module.constants.SwerveModuleConstantsRecord;
+import frc.robot.subsystems.lib.moduleConfig.SwerveModuleConstantsRecord;
 
 public abstract class SwerveModuleIO {
 

@@ -3,9 +3,11 @@ package frc.robot.subsystems.drivetrain.gyro;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.robot.subsystems.drivetrain.DrivetrainConstants;
+import frc.robot.subsystems.lib.chasisConfigs.ChasisConstants;
+
 
 import java.util.Optional;
+
 
 public class GyroIOPigeon implements GyroIO{
     private final Pigeon2 gyro;
@@ -15,7 +17,7 @@ public class GyroIOPigeon implements GyroIO{
 
     public GyroIOPigeon(int id){
         this.gyro = new Pigeon2(id);
-        gyro.getYaw().setUpdateFrequency(1.0 / DrivetrainConstants.LOOP_TIME_SECONDS);
+        gyro.getYaw().setUpdateFrequency(1.0 / ChasisConstants.LOOP_TIME_SECONDS);
         gyro.optimizeBusUtilization();
     }
     @Override
@@ -33,4 +35,6 @@ public class GyroIOPigeon implements GyroIO{
         gyro.reset();
         angleOffset = pose.getRotation();
     }
+
+
 }

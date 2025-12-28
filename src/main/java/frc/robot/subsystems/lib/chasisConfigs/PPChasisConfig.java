@@ -1,4 +1,4 @@
-package frc.robot.subsystems.drivetrain.module.chasisConfigs;
+package frc.robot.subsystems.lib.chasisConfigs;
 
 import com.pathplanner.lib.config.PIDConstants;
 

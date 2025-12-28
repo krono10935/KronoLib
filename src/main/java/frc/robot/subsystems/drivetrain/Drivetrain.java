@@ -16,6 +16,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -23,9 +24,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.PPController;
+import frc.robot.subsystems.drivetrain.gyro.GyroIO;
+import frc.robot.subsystems.drivetrain.gyro.GyroIOSim;
 import frc.robot.subsystems.drivetrain.module.SwerveModuleBasic;
 import frc.robot.subsystems.drivetrain.module.SwerveModuleIO;
-import frc.robot.subsystems.drivetrain.module.chasisConfigs.ChasisConstants;
+import frc.robot.subsystems.lib.chasisConfigs.ChasisConstants;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
@@ -61,12 +64,16 @@ public class Drivetrain extends SubsystemBase {
 
     private static final DriveFeedforwards ZEROS = DriveFeedforwards.zeros(4);
 
+    private final GyroIO gyro;
+
 
 
     public Drivetrain(Supplier<Double> batteryVoltageSupplier, ChasisConstants constants) {
 
         this.batteryVoltageSupplier= batteryVoltageSupplier;
         this.constants = constants;
+        this.gyro = RobotBase.isReal()?constants.getGyro(): new GyroIOSim(this::getChassisSpeeds);
+
 
         for(int i=0;i<4;i++){
             io[i] = new SwerveModuleBasic(constants.getModules()[i]);

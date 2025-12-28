@@ -1,11 +1,11 @@
-package frc.robot.subsystems.drivetrain.module.chasisConfigs;
+package frc.robot.subsystems.lib.chasisConfigs;
 
 import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.subsystems.drivetrain.gyro.GyroIO;
-import frc.robot.subsystems.drivetrain.module.constants.ModuleConstantsGeneric;
-import frc.robot.subsystems.drivetrain.module.constants.SwerveModuleConstantsRecord;
+import frc.robot.subsystems.lib.moduleConfig.ModuleConstantsGeneric;
+import frc.robot.subsystems.lib.moduleConfig.SwerveModuleConstantsRecord;
 
 /**
  * Chassis-level container for swerve drivetrain configuration.
@@ -28,7 +28,9 @@ import frc.robot.subsystems.drivetrain.module.constants.SwerveModuleConstantsRec
  */
 public class ChasisConstants {
 
-    private final GyroIO gyro;
+    public static double LOOP_TIME_SECONDS = 0.02;
+
+    private GyroIO gyro;
 
     private final SwerveModuleConstantsRecord[] modules;
 
@@ -96,6 +98,10 @@ public class ChasisConstants {
         return ppConfig; // returns PathPlanner-specific chassis parameters
     }
 
+    public void setGyroSpeedsSupplier(){
+
+    }
+
     /**
      * Determine whether autonomous paths should be mirrored for the current alliance.
      * <p>
@@ -120,5 +126,9 @@ public class ChasisConstants {
 
     public double getMIN_ANGULAR_SPEED() {
         return MIN_ANGULAR_SPEED;
+    }
+
+    public void setGyro(GyroIO gyro){
+        this.gyro=gyro;
     }
 }

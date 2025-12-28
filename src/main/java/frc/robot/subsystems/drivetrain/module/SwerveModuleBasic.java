@@ -2,7 +2,7 @@ package frc.robot.subsystems.drivetrain.module;
 
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.drivetrain.module.constants.SwerveModuleConstantsRecord;
+import frc.robot.subsystems.lib.moduleConfig.SwerveModuleConstantsRecord;
 import io.github.captainsoccer.basicmotor.ctre.talonfx.BasicTalonFX;
 import io.github.captainsoccer.basicmotor.sim.motor.BasicMotorSim;
 import org.littletonrobotics.junction.Logger;

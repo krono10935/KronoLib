@@ -1,4 +1,4 @@
-package frc.robot.subsystems.drivetrain.module.chasisConfigs;
+package frc.robot.subsystems.lib.chasisConfigs;
 
 /**
  * Chassis-level linear speed limits for the drivetrain.
