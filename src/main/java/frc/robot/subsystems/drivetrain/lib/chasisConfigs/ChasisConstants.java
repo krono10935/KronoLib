@@ -1,11 +1,11 @@
-package frc.robot.subsystems.lib.chasisConfigs;
+package frc.robot.subsystems.drivetrain.lib.chasisConfigs;
 
 import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.subsystems.drivetrain.gyro.GyroIO;
-import frc.robot.subsystems.lib.moduleConfig.ModuleConstantsGeneric;
-import frc.robot.subsystems.lib.moduleConfig.SwerveModuleConstantsRecord;
+import frc.robot.subsystems.drivetrain.lib.moduleConfig.ModuleConstantsGeneric;
+import frc.robot.subsystems.drivetrain.lib.moduleConfig.SwerveModuleConstantsRecord;
 
 /**
  * Chassis-level container for swerve drivetrain configuration.

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.lib.moduleConfig;
+package frc.robot.subsystems.drivetrain.lib.moduleConfig;
 
 import edu.wpi.first.math.geometry.Translation2d;
 

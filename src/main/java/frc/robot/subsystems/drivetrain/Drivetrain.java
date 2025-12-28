@@ -28,7 +28,7 @@ import frc.robot.subsystems.drivetrain.gyro.GyroIO;
 import frc.robot.subsystems.drivetrain.gyro.GyroIOSim;
 import frc.robot.subsystems.drivetrain.module.SwerveModuleBasic;
 import frc.robot.subsystems.drivetrain.module.SwerveModuleIO;
-import frc.robot.subsystems.lib.chasisConfigs.ChasisConstants;
+import frc.robot.subsystems.drivetrain.lib.chasisConfigs.ChasisConstants;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 

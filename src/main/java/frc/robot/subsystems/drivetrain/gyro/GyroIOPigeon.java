@@ -3,7 +3,7 @@ package frc.robot.subsystems.drivetrain.gyro;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.robot.subsystems.lib.chasisConfigs.ChasisConstants;
+import frc.robot.subsystems.drivetrain.lib.chasisConfigs.ChasisConstants;
 
 
 import java.util.Optional;

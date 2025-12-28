@@ -1,9 +1,9 @@
-package frc.robot.subsystems.constants;
+package frc.robot.subsystems.drivetrain.constants;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import frc.robot.subsystems.lib.moduleConfig.ModuleConstantsGeneric;
-import frc.robot.subsystems.lib.moduleConfig.SwerveModuleConstantsRecord;
+import frc.robot.subsystems.drivetrain.lib.moduleConfig.ModuleConstantsGeneric;
+import frc.robot.subsystems.drivetrain.lib.moduleConfig.SwerveModuleConstantsRecord;
 import io.github.captainsoccer.basicmotor.BasicMotor;
 import io.github.captainsoccer.basicmotor.BasicMotorConfig;
 import io.github.captainsoccer.basicmotor.ctre.talonfx.BasicTalonFXConfig;
