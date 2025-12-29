@@ -3,17 +3,17 @@ package frc.robot.subsystems.drivetrain.module;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import frc.robot.subsystems.drivetrain.lib.moduleConfig.SwerveModuleConstantsRecord;
+import frc.robot.subsystems.drivetrain.configsStructure.moduleConfig.ModuleConstants;
 
 public abstract class SwerveModuleIO {
 
-    public final SwerveModuleConstantsRecord constants;
+    public final ModuleConstants constants;
 
     private final SwerveModuleState currentState = new SwerveModuleState();
 
     private final SwerveModulePosition position = new SwerveModulePosition();
 
-    protected SwerveModuleIO(SwerveModuleConstantsRecord constants){
+    protected SwerveModuleIO(ModuleConstants constants){
         this.constants = constants;
     }
 
@@ -23,7 +23,6 @@ public abstract class SwerveModuleIO {
      */
     public abstract void setTargetState(SwerveModuleState targetState);
 
-    public abstract void setTargetStateVoltages(SwerveModuleState targetState);
 
     public SwerveModuleState getState(){
         return currentState;
@@ -65,10 +64,10 @@ public abstract class SwerveModuleIO {
      */
     public abstract void setBrakeMode(boolean isBrake);
 
-    public abstract void setDriveVoltage(double voltage);
+    public abstract void setDriveVoltageAndSteerAngle(double voltage, Rotation2d angle);
 
     public abstract void setSteerVoltage(double voltage);
 
-    public abstract void usePowerAndAngle(double voltage, double angle);
+
 
 }

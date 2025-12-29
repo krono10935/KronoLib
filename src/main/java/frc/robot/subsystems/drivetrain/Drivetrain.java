@@ -2,6 +2,7 @@ package frc.robot.subsystems.drivetrain;
 
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
@@ -23,12 +24,12 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
-import frc.robot.PPController;
 import frc.robot.subsystems.drivetrain.gyro.GyroIO;
+import frc.robot.subsystems.drivetrain.gyro.GyroIOPigeon;
 import frc.robot.subsystems.drivetrain.gyro.GyroIOSim;
 import frc.robot.subsystems.drivetrain.module.SwerveModuleBasic;
 import frc.robot.subsystems.drivetrain.module.SwerveModuleIO;
-import frc.robot.subsystems.drivetrain.lib.chasisConfigs.ChasisConstants;
+import frc.robot.subsystems.drivetrain.configsStructure.ChassisConstants;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
@@ -43,7 +44,7 @@ public class Drivetrain extends SubsystemBase {
         public ChassisSpeeds speeds = new ChassisSpeeds();
         public SwerveModuleState[] moduleStates = new SwerveModuleState[4];
     }
-    private final ChasisConstants constants;
+    private final ChassisConstants constants;
 
 
     private final DrivetrainInputsAutoLogged inputs = new DrivetrainInputsAutoLogged();
@@ -68,36 +69,39 @@ public class Drivetrain extends SubsystemBase {
 
 
 
-    public Drivetrain(Supplier<Double> batteryVoltageSupplier, ChasisConstants constants) {
+    public Drivetrain(Supplier<Double> batteryVoltageSupplier, ChassisConstants constants) {
 
         this.batteryVoltageSupplier= batteryVoltageSupplier;
+
         this.constants = constants;
-        this.gyro = RobotBase.isReal()?constants.getGyro(): new GyroIOSim(this::getChassisSpeeds);
+
+        this.gyro = RobotBase.isReal()?new GyroIOPigeon(constants.GYRO_ID): new GyroIOSim(this::getChassisSpeeds);
+
 
 
         for(int i=0;i<4;i++){
-            io[i] = new SwerveModuleBasic(constants.getModules()[i]);
+            io[i] = new SwerveModuleBasic(constants.MODULE_CONSTANTS[i]);
             inputs.moduleStates[i] = io[i].getState();
             modulePositions[i] = io[i].getPosition();
         }
 
 
-        //TODO: add max steer speed
+
         setpointGenerator = new SwerveSetpointGenerator(
-                constants.getRobotConfig(),
-                0
+                constants.ROBOT_CONFIG,
+                constants.COMMON_MODULE_CONSTANTS.maxSteerSpeed()
 
         );
 
         previousSetpoint = new SwerveSetpoint(new ChassisSpeeds(), inputs.moduleStates,
                 DriveFeedforwards.zeros(inputs.moduleStates.length));
 
-        kinematics = new SwerveDriveKinematics(constants.getRobotConfig().moduleLocations);
+        kinematics = new SwerveDriveKinematics(constants.ROBOT_CONFIG.moduleLocations);
 
         poseEstimator = new SwerveDrivePoseEstimator(kinematics, getGyroAngle(), modulePositions,
                 Constants.STARTING_POSE);
 
-        configPathPlanner();
+        configPathPlanner(constants.ROBOT_CONFIG);
 
         var setBrake = new InstantCommand(() -> setBrakeMode(true))
                 .ignoringDisable(true);
@@ -115,9 +119,14 @@ public class Drivetrain extends SubsystemBase {
 
     }
 
+    public ChassisConstants getConstants() {
+        return constants;
+    }
 
-
-    private void configPathPlanner(){
+    /**
+     * configures the AutoBuilder for PP
+     */
+    private void configPathPlanner(RobotConfig config){
 
         // Configure AutoBuilder last
         AutoBuilder.configure(
@@ -126,10 +135,10 @@ public class Drivetrain extends SubsystemBase {
                 this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 (speeds, feedforwards) -> drive(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
                 new PPController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                        constants.getPpConfig().PID_CONSTANTS(), constants.getPpConfig().ANGULAR_PID_CONSTANTS() // Rotation PID constants
+                            constants.PP_CONFIG.PID_CONSTANTS(), constants.PP_CONFIG.ANGULAR_PID_CONSTANTS() // Rotation PID constants
                 ),
-                constants.getRobotConfig(), // The robot configuration
-                ChasisConstants::shouldFlipPath,
+                config, // The robot configuration
+                ChassisConstants::shouldFlipPath,
                 this // Reference to this subsystem to set requirements
         );
 
@@ -155,7 +164,7 @@ public class Drivetrain extends SubsystemBase {
      */
     public void drive(ChassisSpeeds speeds) {
         previousSetpoint = setpointGenerator.generateSetpoint(previousSetpoint, speeds, null,
-                constants.getPpConfig().LOOP_TIME_SECONDS(), batteryVoltageSupplier.get());
+                ChassisConstants.LOOP_TIME_SECONDS, batteryVoltageSupplier.get());
 
         for (int i = 0; i < 4; i++){
             var targetSpeed = previousSetpoint.moduleStates()[i];
@@ -170,7 +179,7 @@ public class Drivetrain extends SubsystemBase {
      * set the speeds which regular kinematics
      * @param speeds the target speed of the robot
      */
-    public void setChassisSpeeds(ChassisSpeeds speeds) {
+    public void driveWithoutPP(ChassisSpeeds speeds) {
 
         var targetSpeeds = kinematics.toWheelSpeeds(speeds);
         for (int i = 0; i < 4; i++){
@@ -195,9 +204,11 @@ public class Drivetrain extends SubsystemBase {
 
 
         previousSetpoint = new SwerveSetpoint(new ChassisSpeeds(),kinematics.toSwerveModuleStates(new ChassisSpeeds()),ZEROS);
+
         for (int i = 0; i < 4; i++){
-            io[i].setTargetState(new SwerveModuleState(0, new Rotation2d(0)));
+            io[i].setTargetState(previousSetpoint.moduleStates()[i]);
         }
+
         Logger.recordOutput("drivetrain/requested speeds", new ChassisSpeeds());
         Logger.recordOutput("drivetrain/target speeds", previousSetpoint.robotRelativeSpeeds());
         Logger.recordOutput("drivetrain/target states", previousSetpoint.moduleStates());
@@ -248,38 +259,12 @@ public class Drivetrain extends SubsystemBase {
         return poseEstimator.getEstimatedPosition();
     }
 
-    @Override
-    public void periodic() {
-        inputs.gyroAngle = constants.getGyro().update();
-
-        for (int i=0;i<4;i++){
-            io[i].update();
-            this.inputs.moduleStates[i] = io[i].getState();
-            modulePositions[i] = io[i].getPosition();
-        }
-
-        inputs.speeds = kinematics.toChassisSpeeds(this.inputs.moduleStates);
-
-        poseEstimator.update(getGyroAngle(), modulePositions);
-
-        constants.getGyro().getEstimatedPosition().ifPresent((
-                pose -> poseEstimator.addVisionMeasurement(pose.pose(), Timer.getTimestamp(), pose.stdDevs())));
-
-        Logger.processInputs("drivetrain", inputs);
-        Logger.recordOutput("drivetrain/estimated pose", getEstimatedPosition());
-
-        String currentCommand = getCurrentCommand() == null ? "None" : getCurrentCommand().getName();
-
-        Logger.recordOutput("drivetrain/current command", currentCommand);
-    }
-
-
     /**
      * Reset the gyro and the pose estimator states
      * @param newPose new pose of the robot
      */
     public void reset(Pose2d newPose){
-        constants.getGyro().reset(newPose);
+        this.gyro.reset(newPose);
         poseEstimator.resetPosition(newPose.getRotation(), modulePositions, newPose);
     }
 
@@ -295,53 +280,38 @@ public class Drivetrain extends SubsystemBase {
         }
     }
 
-    public void setDriveVoltage(double voltage){
-        for (SwerveModuleIO module : io){
-            module.setDriveVoltage(voltage);
+
+
+    public void setDriveVoltageAndSteerAngle(double voltage, Rotation2d[] angle) {
+        for (int i = 0; i < 4; i++){
+            io[i].setDriveVoltageAndSteerAngle(voltage, angle[i]);
         }
     }
 
-    public void usePowerAndAngle(double voltage, Rotation2d angle) {
-        var targetSpeeds = new SwerveModuleState[4];
-        for (int i = 0; i < 4; i++){
-            targetSpeeds[i] = new SwerveModuleState(
-                    voltage,
-                    angle
-            );
+
+    @Override
+    public void periodic() {
+        inputs.gyroAngle = this.gyro.update();
+
+        for (int i=0;i<4;i++){
+            io[i].update();
+            this.inputs.moduleStates[i] = io[i].getState();
+            modulePositions[i] = io[i].getPosition();
         }
 
-        for (int i = 0; i < 4; i++){
-            targetSpeeds[i].cosineScale(io[i].getState().angle);
-            io[i].setTargetStateVoltages(targetSpeeds[i]);
-        }
-        Logger.recordOutput("drivetrain/swerve/target states sysid with angle", targetSpeeds);
-    }
+        inputs.speeds = kinematics.toChassisSpeeds(this.inputs.moduleStates);
 
-    public void spinWithPower(double voltage) {
-        var targetSpeeds = new SwerveModuleState[4];
-        for (int i = 0; i < 2; i++){
-            targetSpeeds[i] = new SwerveModuleState(
-                    voltage,
-                    Rotation2d.fromDegrees(-45 - 90 * i)
-            );
-        }
+        poseEstimator.update(getGyroAngle(), modulePositions);
 
-        for (int i = 0; i < 2; i++){
-            targetSpeeds[i+2] = new SwerveModuleState(
-                    voltage,
-                    Rotation2d.fromDegrees(45 + 90 * i)
-            );
-        }
+        this.gyro.getEstimatedPosition().ifPresent((
+                pose -> poseEstimator.addVisionMeasurement(pose.pose(), Timer.getTimestamp(), pose.stdDevs())));
 
-        for (int i = 0; i < 4; i++){
-            targetSpeeds[i].cosineScale(io[i].getState().angle);
-            io[i].setTargetStateVoltages(targetSpeeds[i]);
-        }
-        Logger.recordOutput("drivetrain/swerve/target states sysid", targetSpeeds);
-    }
+        Logger.processInputs("drivetrain", inputs);
+        Logger.recordOutput("drivetrain/estimated pose", getEstimatedPosition());
 
-    public ChasisConstants getConstants() {
-        return constants;
+        String currentCommand = getCurrentCommand() == null ? "None" : getCurrentCommand().getName();
+
+        Logger.recordOutput("drivetrain/current command", currentCommand);
     }
 }
 

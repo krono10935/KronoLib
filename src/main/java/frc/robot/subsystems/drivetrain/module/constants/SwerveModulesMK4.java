@@ -1,9 +1,9 @@
-package frc.robot.subsystems.drivetrain.constants;
+package frc.robot.subsystems.drivetrain.module.constants;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import frc.robot.subsystems.drivetrain.lib.moduleConfig.ModuleConstantsGeneric;
-import frc.robot.subsystems.drivetrain.lib.moduleConfig.SwerveModuleConstantsRecord;
+import frc.robot.subsystems.drivetrain.configsStructure.moduleConfig.CommonModuleConstants;
+import frc.robot.subsystems.drivetrain.configsStructure.moduleConfig.ModuleConstants;
 import io.github.captainsoccer.basicmotor.BasicMotor;
 import io.github.captainsoccer.basicmotor.BasicMotorConfig;
 import io.github.captainsoccer.basicmotor.ctre.talonfx.BasicTalonFXConfig;
@@ -75,8 +75,8 @@ public enum SwerveModulesMK4 {
                      double steerKV,
                      double steerKA,
                      Translation2d location) {
-        BasicTalonFXConfig driveConfig = getGenericConf().driveConfig().copy();
-        BasicTalonFXConfig steerConfig = getGenericConf().steerConfig().copy();
+        BasicTalonFXConfig driveConfig = getGenericConf().DRIVE_CONFIG().copy();
+        BasicTalonFXConfig steerConfig = getGenericConf().STEER_CONFIG().copy();
 
         driveConfig.motorConfig.id = driveMotorID;
         steerConfig.motorConfig.id = steerMotorID;
@@ -92,7 +92,10 @@ public enum SwerveModulesMK4 {
         steerConfig.simulationConfig.kV = steerKV;
         steerConfig.simulationConfig.kA = steerKA;
 
-        constants = new SwerveModuleConstantsRecord(canCoderID, zeroOffset, driveConfig, steerConfig, location,this.name());
+        driveConfig.motorConfig.name = this.name() + " drive motor";
+        steerConfig.motorConfig.name = this.name() + " steer motor";
+
+        constants = new ModuleConstants(canCoderID, zeroOffset, driveConfig, steerConfig, location,this.name());
 
 
 
@@ -100,8 +103,10 @@ public enum SwerveModulesMK4 {
 
 
 
-    public final SwerveModuleConstantsRecord constants;
-    public ModuleConstantsGeneric getGenericConf(){
+    public final ModuleConstants constants;
+
+    public static CommonModuleConstants getGenericConf(){
+        if(genericConf != null) return genericConf;
 
         var driveConfig = new BasicTalonFXConfig();
 
@@ -126,10 +131,17 @@ public enum SwerveModulesMK4 {
         steerConfig.constraintsConfig.minValue = -0.5;
 
 
-        if(genericConf==null) genericConf = new ModuleConstantsGeneric(driveConfig,steerConfig,1,2);
+        genericConf = new CommonModuleConstants(driveConfig,steerConfig,1,2, 1);
         return genericConf;
     }
 
+    private static CommonModuleConstants genericConf;
 
-    public static  ModuleConstantsGeneric genericConf;
+    public static ModuleConstants[] getConstants(){
+        ModuleConstants[] constants = new ModuleConstants[values().length];
+        for(int i=0;i<values().length;i++){
+            constants[i] = values()[i].constants;
+        }
+        return constants;
+    }
 }

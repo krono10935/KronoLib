@@ -1,8 +1,8 @@
 package frc.robot.subsystems.drivetrain.module;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.drivetrain.lib.moduleConfig.SwerveModuleConstantsRecord;
+import frc.robot.subsystems.drivetrain.configsStructure.moduleConfig.ModuleConstants;
 import io.github.captainsoccer.basicmotor.ctre.talonfx.BasicTalonFX;
 import io.github.captainsoccer.basicmotor.sim.motor.BasicMotorSim;
 import org.littletonrobotics.junction.Logger;
@@ -23,25 +23,25 @@ public class SwerveModuleBasic extends SwerveModuleIO {
 
     private final CANcoder canCoder;
 
-    public SwerveModuleBasic(SwerveModuleConstantsRecord constants){
+    public SwerveModuleBasic(ModuleConstants constants){
         super(constants);
 
         if (RobotBase.isReal()) {
-            drivingMotor = new BasicTalonFX(constants.drivingConfig());
-            steeringMotor = new BasicTalonFX(constants.steeringConfig());
+            drivingMotor = new BasicTalonFX(constants.DRIVING_CONFIG());
+            steeringMotor = new BasicTalonFX(constants.STEERING_CONFIG());
 
             canCoder = createCANcoder(constants);
             steeringMotor.resetEncoder(canCoder.getPosition().getValueAsDouble());
 
-//            ((BasicTalonFX) steeringMotor).useRemoteCanCoder(canCoder, constants.STEERING_CONFIG.motorConfig.gearRatio);
+
 
             canCoder.getMagnetHealth().setUpdateFrequency(4);
             canCoder.optimizeBusUtilization();
 
         }
         else{
-            drivingMotor = new BasicMotorSim(constants.drivingConfig());
-            steeringMotor = new BasicMotorSim(constants.steeringConfig());
+            drivingMotor = new BasicMotorSim(constants.DRIVING_CONFIG());
+            steeringMotor = new BasicMotorSim(constants.STEERING_CONFIG());
 
             canCoder = null;
         }
@@ -53,11 +53,7 @@ public class SwerveModuleBasic extends SwerveModuleIO {
         steeringMotor.setControl(targetState.angle.getRotations(),ControlMode.POSITION);
     }
 
-    @Override
-    public void setTargetStateVoltages(SwerveModuleState targetState) {
-        drivingMotor.setVoltage(targetState.speedMetersPerSecond);
-        steeringMotor.setControl(targetState.angle.getRotations(),ControlMode.POSITION);
-    }
+
 
     @Override
     protected double getDriveVelocity() {
@@ -87,12 +83,12 @@ public class SwerveModuleBasic extends SwerveModuleIO {
      * @param constants
      * @return A configured CANCoder for the module
      */
-    private static CANcoder createCANcoder(SwerveModuleConstantsRecord constants){
-        CANcoder encoder = new CANcoder(constants.canCoderID());
+    private static CANcoder createCANcoder(ModuleConstants constants){
+        CANcoder encoder = new CANcoder(constants.CAN_CODER_ID());
         var config = new CANcoderConfiguration();
         config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
         config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-        config.MagnetSensor.MagnetOffset = -constants.zeroOffset();
+        config.MagnetSensor.MagnetOffset = -constants.ZERO_OFFSET();
 
         encoder.getConfigurator().apply(config);
         return encoder;
@@ -102,11 +98,9 @@ public class SwerveModuleBasic extends SwerveModuleIO {
     public void update(){
         super.update();
         if (canCoder != null){
-            Logger.recordOutput("basic module/" + constants.name() + "/magnet health",
+            Logger.recordOutput("basic module/" + constants.NAME() + "/magnet health",
                     canCoder.getMagnetHealth().toString());
-            Logger.recordOutput("basic module/" + constants.name() + "/cancoder pos", canCoder.getPosition().getValueAsDouble()  );
         }
-        SmartDashboard.putData(drivingMotor.getController());
     }
 
     public void setDriveVoltage(double voltage){
@@ -118,8 +112,8 @@ public class SwerveModuleBasic extends SwerveModuleIO {
     }
 
     @Override
-    public void usePowerAndAngle(double voltage, double angle) {
-        setDriveVoltage(voltage);
-        steeringMotor.setControl(angle, ControlMode.POSITION);
+    public void setDriveVoltageAndSteerAngle(double voltage, Rotation2d angle) {
+        steeringMotor.setControl(angle.getRotations(), ControlMode.POSITION);
+        drivingMotor.setVoltage(voltage);
     }
 }

@@ -9,7 +9,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.drivetrain.Drivetrain;
-import frc.robot.subsystems.drivetrain.lib.chasisConfigs.ChasisConstants;
+import frc.robot.subsystems.drivetrain.configsStructure.ChassisConstants;
 
 
 public class DriveCommand extends Command {
@@ -29,14 +29,14 @@ public class DriveCommand extends Command {
     this.controller = controller;
     addRequirements(drivetrain);
 
-    MAX_LINEAR_SPEED = drivetrain.getConstants().getSpeedConfig().maxLinearSpeed();
-    MIN_LINEAR_SPEED = drivetrain.getConstants().getSpeedConfig().minLinearSpeed();
-    MAX_ANGULAR_SPEED = drivetrain.getConstants().getMAX_ANGULAR_SPEED();
-    MIN_ANGULAR_SPEED = drivetrain.getConstants().getMIN_ANGULAR_SPEED();
+    MAX_LINEAR_SPEED = drivetrain.getConstants().SPEED_CONFIG.maxLinearSpeed();
+    MIN_LINEAR_SPEED = drivetrain.getConstants().SPEED_CONFIG.minLinearSpeed();
+    MAX_ANGULAR_SPEED = drivetrain.getConstants().MAX_ANGULAR_SPEED;
+    MIN_ANGULAR_SPEED = drivetrain.getConstants().MIN_ANGULAR_SPEED;
   }
 
   private Rotation2d angleFieldRelative(){
-      return ChasisConstants.shouldFlipPath()?
+      return ChassisConstants.shouldFlipPath()?
               drivetrain.getGyroAngle():drivetrain.getGyroAngle().rotateBy(Rotation2d.k180deg) ;
   }
 
@@ -50,7 +50,7 @@ public class DriveCommand extends Command {
     double ySpeed = deadband(controller.getLeftY()) * speed;
     double thetaSpeed = deadband(-controller.getRightX()) * angularSpeed;
 
-    drivetrain.setChassisSpeeds(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, thetaSpeed, angleFieldRelative()));
+    drivetrain.drive(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, thetaSpeed, angleFieldRelative()));
   }
 
   /**

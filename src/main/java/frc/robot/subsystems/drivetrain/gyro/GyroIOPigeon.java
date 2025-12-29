@@ -3,7 +3,7 @@ package frc.robot.subsystems.drivetrain.gyro;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.robot.subsystems.drivetrain.lib.chasisConfigs.ChasisConstants;
+import frc.robot.subsystems.drivetrain.configsStructure.ChassisConstants;
 
 
 import java.util.Optional;
@@ -17,7 +17,7 @@ public class GyroIOPigeon implements GyroIO{
 
     public GyroIOPigeon(int id){
         this.gyro = new Pigeon2(id);
-        gyro.getYaw().setUpdateFrequency(1.0 / ChasisConstants.LOOP_TIME_SECONDS);
+        gyro.getYaw().setUpdateFrequency(1.0 / ChassisConstants.LOOP_TIME_SECONDS);
         gyro.optimizeBusUtilization();
     }
     @Override

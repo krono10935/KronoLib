@@ -8,16 +8,18 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.DriveCommand;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import org.littletonrobotics.conduit.ConduitApi;
 
 
 public class RobotContainer
 {
-    private CommandXboxController cmd;
 
     private static RobotContainer instance;
+    CommandXboxController driverController = new CommandXboxController(0);
+    public final Drivetrain drivetrain;
 
-    Drivetrain drivetrain;
 
     public static RobotContainer getInstance(){
         if (instance == null){
@@ -28,25 +30,11 @@ public class RobotContainer
 
     private RobotContainer()
     {
-
+        drivetrain = new Drivetrain(ConduitApi.getInstance()::getPDPVoltage, Constants.CHASSIS_TYPE.constants);
+        drivetrain.setDefaultCommand(new DriveCommand(drivetrain, driverController));
     }
 
     private void configureBindings() {
-        //        controller.a().whileTrue(
-//            swerveSysID.sysIdQuasistaticDrive(Direction.kForward)
-//        );
-//
-//        controller.b().whileTrue(
-//            swerveSysID.sysIdQuasistaticDrive(Direction.kReverse)
-//        );
-//
-//        controller.y().whileTrue(
-//            swerveSysID.sysIdDynamicDrive(Direction.kForward)
-//        );
-//
-//        controller.x().whileTrue(
-//            swerveSysID.sysIdDynamicDrive(Direction.kReverse)
-//        );
 
     }
     

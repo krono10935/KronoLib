@@ -17,6 +17,7 @@ public class SwerveSysID {
    private CommandXboxController controller;
    private Drivetrain drivetrain;
 
+
    public static final double VOLT = 2;
 
    public static final double VOLT_RAMP_RATE = 0.5;
@@ -71,12 +72,20 @@ public class SwerveSysID {
    public void driveWithController(double voltage) {
 
       Rotation2d angle = new Translation2d(-controller.getLeftX(), -controller.getLeftY()).getAngle().rotateBy(drivetrain.getGyroAngle().unaryMinus());
+      Rotation2d[] angleArray = {angle, angle, angle, angle};
 
-      drivetrain.usePowerAndAngle(voltage, angle);
+      drivetrain.setDriveVoltageAndSteerAngle(voltage, angleArray);
    }
 
+   private final Rotation2d[] spinAngleArray = {
+           Rotation2d.fromDegrees(135),
+           Rotation2d.fromDegrees(135+90),
+           Rotation2d.fromDegrees(135+180),
+           Rotation2d.fromDegrees(135+270)
+   };
+
    public void spin(double voltage) {
-      drivetrain.spinWithPower(voltage);
+      drivetrain.setDriveVoltageAndSteerAngle(voltage, spinAngleArray);
    }
 
 
