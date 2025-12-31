@@ -8,6 +8,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.utils.ModeFileHandling;
+import frc.utils.SwitchedToPitModeException;
 import io.github.captainsoccer.basicmotor.motorManager.MotorManager;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -19,7 +20,7 @@ public class Robot extends LoggedRobot
 {
     private Command autonomousCommand;
 
-    private boolean isPitMode;
+
     public Robot()
     {
 
@@ -49,8 +50,8 @@ public class Robot extends LoggedRobot
             // Publish data to NetworkTables only if not in comp mode
             if(!ModeFileHandling.isCompMode()) {
                 Logger.addDataReceiver(new NT4Publisher());
-                isPitMode =  true;
-            }else isPitMode = false;
+
+            }
 
         } else {
             Logger.addDataReceiver(new NT4Publisher());
@@ -78,9 +79,9 @@ public class Robot extends LoggedRobot
     public void disabledPeriodic() {
 
         //Check if should switch to pit mode
-        if(!isPitMode && ModeFileHandling.shouldSwitchToPitMode()){
+        if(ModeFileHandling.isCompMode() && ModeFileHandling.shouldSwitchToPitMode()){
             ModeFileHandling.switchToPitMode();
-            throw new RuntimeException("Switched to pit mode");
+            throw new SwitchedToPitModeException("Switched to pit mode");
         }
     }
     
