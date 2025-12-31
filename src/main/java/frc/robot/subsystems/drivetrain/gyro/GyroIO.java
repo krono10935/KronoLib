@@ -13,7 +13,7 @@ import edu.wpi.first.math.numbers.N3;
 import java.util.Optional;
 
 /** Add your docs here. */
-public interface GyroIO {
+public interface GyroIO{
 
     /**
      * get the estimated position using the gyro's accelerometer

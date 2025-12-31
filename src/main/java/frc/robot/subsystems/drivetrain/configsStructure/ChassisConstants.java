@@ -6,6 +6,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.subsystems.drivetrain.configsStructure.moduleConfig.CommonModuleConstants;
 import frc.robot.subsystems.drivetrain.configsStructure.moduleConfig.ModuleConstants;
+import frc.robot.subsystems.drivetrain.gyro.GyroIO;
+import frc.robot.subsystems.drivetrain.gyro.GyroType;
 
 /**
  * Chassis-level container for swerve drivetrain configuration.
@@ -23,7 +25,7 @@ import frc.robot.subsystems.drivetrain.configsStructure.moduleConfig.ModuleConst
  * <p>
  * Example usage:
  * <pre>
- *   ChasisConstants constants = new ChasisConstants(gyro, modules, speedCfg, generic, ppCfg);
+ *   ChassisConstants constants = new ChassisConstants(gyro, modules, speedCfg, generic, ppCfg, gyroType, gyroPort(if using pigeon );
  * </pre>
  */
 public class ChassisConstants {
@@ -44,7 +46,9 @@ public class ChassisConstants {
 
     public final double MIN_ANGULAR_SPEED; //rad/s
 
-    public final int GYRO_ID;
+    public final GyroType GYRO_TYPE;
+
+    public final int GYRO_PORT;
 
     /**
      * Create chassis constants and derive the PathPlanner {@link RobotConfig} from the
@@ -54,16 +58,18 @@ public class ChassisConstants {
      * @param SPEED_CONFIG  chassis-level speed limits and tuning parameters
      * @param COMMON_MODULE_CONSTANTS      generic module configuration for all the modules
      * @param PP_CONFIG     chassis parameters for PathPlanner (mass, MOI, etc.)
-     * @param GYRO_ID       CAN ID of the gyro
+     * @param GYRO_TYPE type of gyro used
+     * @param GYRO_PORT port/canID number of the gyro. can be overlooked if using Navx
      */
     public ChassisConstants(ModuleConstants[] MODULE_CONSTANTS,
                             ChassisSpeedConfig SPEED_CONFIG, CommonModuleConstants COMMON_MODULE_CONSTANTS,
-                            PPChassisConfig PP_CONFIG, int GYRO_ID) {
+                            PPChassisConfig PP_CONFIG, GyroType GYRO_TYPE, int GYRO_PORT) {
         this.MODULE_CONSTANTS = MODULE_CONSTANTS;
         this.SPEED_CONFIG = SPEED_CONFIG;
         this.PP_CONFIG = PP_CONFIG;
         this.COMMON_MODULE_CONSTANTS = COMMON_MODULE_CONSTANTS;
-        this.GYRO_ID = GYRO_ID;
+        this.GYRO_TYPE = GYRO_TYPE;
+        this.GYRO_PORT = GYRO_PORT;
 
         Translation2d[] moduleTranslations = new Translation2d[MODULE_CONSTANTS.length];
         for (int i = 0; i < MODULE_CONSTANTS.length; i++) {
@@ -86,7 +92,7 @@ public class ChassisConstants {
      * Determine whether autonomous paths should be mirrored for the current alliance.
      * <p>
      * PathPlanner expects paths to be authored from the Blue alliance perspective. This
-     * helper returns true for Red so the path can be flipped at runtime. If the alliance
+     * helper returns true for Red, so the path can be flipped at runtime. If the alliance
      * is unknown (e.g., in simulation or before FMS connection), this method returns false
      * and paths are not flipped.
      *

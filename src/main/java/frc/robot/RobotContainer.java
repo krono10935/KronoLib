@@ -19,8 +19,10 @@ public class RobotContainer
 {
 
     private static RobotContainer instance;
-    CommandXboxController driverController = new CommandXboxController(0);
+
     public final Drivetrain drivetrain;
+
+    private final CommandXboxController controller;
 
 
     public static RobotContainer getInstance(){
@@ -32,8 +34,10 @@ public class RobotContainer
 
     private RobotContainer()
     {
+        controller = new CommandXboxController(0);
         drivetrain = new Drivetrain(ConduitApi.getInstance()::getPDPVoltage, Constants.CHASSIS_TYPE.constants);
-        drivetrain.setDefaultCommand(new DriveCommand(drivetrain, driverController));
+        drivetrain.setDefaultCommand(new DriveCommand(drivetrain, controller));
+
     }
 
     private void configureBindings() {

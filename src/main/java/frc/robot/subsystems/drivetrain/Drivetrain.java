@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.subsystems.drivetrain.gyro.GyroIO;
+import frc.robot.subsystems.drivetrain.gyro.GyroIONavx;
 import frc.robot.subsystems.drivetrain.gyro.GyroIOPigeon;
 import frc.robot.subsystems.drivetrain.gyro.GyroIOSim;
 import frc.robot.subsystems.drivetrain.module.SwerveModuleBasic;
@@ -34,6 +35,7 @@ import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class Drivetrain extends SubsystemBase {
@@ -75,7 +77,11 @@ public class Drivetrain extends SubsystemBase {
 
         this.constants = constants;
 
-        this.gyro = RobotBase.isReal()?new GyroIOPigeon(constants.GYRO_ID): new GyroIOSim(this::getChassisSpeeds);
+        this.gyro = RobotBase.isReal()?switch (constants.GYRO_TYPE){
+            case NAVX -> new GyroIONavx();
+            case PIGEON -> new GyroIOPigeon(constants.GYRO_PORT);
+        }: new GyroIOSim(this::getChassisSpeeds);
+
 
 
 

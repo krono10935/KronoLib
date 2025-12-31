@@ -9,8 +9,10 @@ import frc.robot.subsystems.drivetrain.configsStructure.ChassisConstants;
 import java.util.Optional;
 
 
-public class GyroIOPigeon implements GyroIO{
+public final class GyroIOPigeon implements GyroIO{
     private final Pigeon2 gyro;
+
+    public static final int PIGEON_ID = 2;
 
     private Rotation2d angleOffset = Rotation2d.kZero;
 
