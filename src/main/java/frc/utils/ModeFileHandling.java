@@ -5,8 +5,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import java.io.File;
 
 public class ModeFileHandling {
-    private static boolean wasFmsChecked = false;
-    private static boolean fmsAttached;
+    private static boolean fmsAttached = false;
     private static final String MODE_FILE_PATH = "/home/lvuser/isComp.txt";
 
     /**
@@ -32,9 +31,8 @@ public class ModeFileHandling {
      */
     public static boolean shouldSwitchToPitMode() {
 
-        if(!wasFmsChecked){
+        if(!fmsAttached){
             fmsAttached = DriverStation.isFMSAttached();
-            wasFmsChecked = true;
         }
 
         if(fmsAttached) return false;
