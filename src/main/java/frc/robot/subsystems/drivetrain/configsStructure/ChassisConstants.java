@@ -6,8 +6,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.subsystems.drivetrain.configsStructure.moduleConfig.CommonModuleConstants;
 import frc.robot.subsystems.drivetrain.configsStructure.moduleConfig.ModuleConstants;
-import frc.robot.subsystems.drivetrain.gyro.GyroIO;
-import frc.robot.subsystems.drivetrain.gyro.GyroType;
 
 /**
  * Chassis-level container for swerve drivetrain configuration.
@@ -46,7 +44,6 @@ public class ChassisConstants {
 
     public final double MIN_ANGULAR_SPEED; //rad/s
 
-    public final GyroType GYRO_TYPE;
 
     public final int GYRO_PORT;
 
@@ -58,17 +55,15 @@ public class ChassisConstants {
      * @param SPEED_CONFIG  chassis-level speed limits and tuning parameters
      * @param COMMON_MODULE_CONSTANTS      generic module configuration for all the modules
      * @param PP_CONFIG     chassis parameters for PathPlanner (mass, MOI, etc.)
-     * @param GYRO_TYPE type of gyro used
      * @param GYRO_PORT port/canID number of the gyro. can be overlooked if using Navx
      */
     public ChassisConstants(ModuleConstants[] MODULE_CONSTANTS,
                             ChassisSpeedConfig SPEED_CONFIG, CommonModuleConstants COMMON_MODULE_CONSTANTS,
-                            PPChassisConfig PP_CONFIG, GyroType GYRO_TYPE, int GYRO_PORT) {
+                            PPChassisConfig PP_CONFIG, int GYRO_PORT) {
         this.MODULE_CONSTANTS = MODULE_CONSTANTS;
         this.SPEED_CONFIG = SPEED_CONFIG;
         this.PP_CONFIG = PP_CONFIG;
         this.COMMON_MODULE_CONSTANTS = COMMON_MODULE_CONSTANTS;
-        this.GYRO_TYPE = GYRO_TYPE;
         this.GYRO_PORT = GYRO_PORT;
 
         Translation2d[] moduleTranslations = new Translation2d[MODULE_CONSTANTS.length];
