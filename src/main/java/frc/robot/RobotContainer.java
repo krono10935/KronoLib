@@ -13,6 +13,12 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommand;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import org.littletonrobotics.conduit.ConduitApi;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.DriveToPose;
+import com.pathplanner.lib.path.DriveToPoseConstants;
+import edu.wpi.first.wpilibj2.command.*;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 
 public class RobotContainer
@@ -22,7 +28,7 @@ public class RobotContainer
 
     public final Drivetrain drivetrain;
 
-    private final CommandXboxController controller;
+    private final LoggedDashboardChooser<Command> chooser;
 
 
     public static RobotContainer getInstance(){
@@ -34,10 +40,17 @@ public class RobotContainer
 
     private RobotContainer()
     {
-        controller = new CommandXboxController(0);
         drivetrain = new Drivetrain(ConduitApi.getInstance()::getPDPVoltage, Constants.CHASSIS_TYPE.constants);
-        drivetrain.setDefaultCommand(new DriveCommand(drivetrain, controller));
-
+        DriveToPose.configure(
+                new DriveToPoseConstants(
+                        drivetrain::getEstimatedPosition,
+                        drivetrain::getChassisSpeeds,
+                        drivetrain::drive,
+                        "driveToPose"
+                )
+        );
+        configureBindings();
+        chooser = new LoggedDashboardChooser<>("chooser", AutoBuilder.buildAutoChooser());
     }
 
     private void configureBindings() {
@@ -47,6 +60,8 @@ public class RobotContainer
     
     public Command getAutonomousCommand()
     {
-        return new InstantCommand(() -> drivetrain.drive(new ChassisSpeeds(3, 0, 0)), drivetrain).repeatedly();
+        return chooser.get();
     }
+
+
 }

@@ -87,6 +87,6 @@ public class DriveCommand extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    drivetrain.drive(new ChassisSpeeds());
+    drivetrain.stop();
   }
 }

@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.subsystems.drivetrain.gyro.GyroIO;
-import frc.robot.subsystems.drivetrain.gyro.GyroIONavx;
 import frc.robot.subsystems.drivetrain.gyro.GyroIOPigeon;
 import frc.robot.subsystems.drivetrain.gyro.GyroIOSim;
 import frc.robot.subsystems.drivetrain.module.SwerveModuleBasic;
@@ -35,7 +34,6 @@ import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
 
-import java.util.Optional;
 import java.util.function.Supplier;
 
 public class Drivetrain extends SubsystemBase {
@@ -73,14 +71,12 @@ public class Drivetrain extends SubsystemBase {
 
     public Drivetrain(Supplier<Double> batteryVoltageSupplier, ChassisConstants constants) {
 
-        this.batteryVoltageSupplier= batteryVoltageSupplier;
+        this.batteryVoltageSupplier = batteryVoltageSupplier;
 
         this.constants = constants;
 
-        this.gyro = RobotBase.isReal()?switch (constants.GYRO_TYPE){
-            case NAVX -> new GyroIONavx();
-            case PIGEON -> new GyroIOPigeon(constants.GYRO_PORT);
-        }: new GyroIOSim(this::getChassisSpeeds);
+        this.gyro = RobotBase.isReal() ? new GyroIOPigeon(constants.GYRO_PORT)
+        : new GyroIOSim(this::getChassisSpeeds);
 
 
 
@@ -105,7 +101,7 @@ public class Drivetrain extends SubsystemBase {
         kinematics = new SwerveDriveKinematics(constants.ROBOT_CONFIG.moduleLocations);
 
         poseEstimator = new SwerveDrivePoseEstimator(kinematics, getGyroAngle(), modulePositions,
-                Constants.STARTING_POSE);
+                Pose2d.kZero);
 
         configPathPlanner(constants.ROBOT_CONFIG);
 
@@ -152,13 +148,13 @@ public class Drivetrain extends SubsystemBase {
                 (poses) -> {
                     var posesArr = poses.toArray(new Pose2d[0]);
 
-                    Logger.recordOutput("DriveTrain/PathPlanner/active path", posesArr);
+                    Logger.recordOutput("driveTrain/PathPlanner/active path", posesArr);
                 }
         );
 
         PathPlannerLogging.setLogTargetPoseCallback(
                 (pose) -> {
-                    Logger.recordOutput("DriveTrain/PathPlanner/target pose", pose);
+                    Logger.recordOutput("driveTrain/PathPlanner/target pose", pose);
                 }
         );
     }

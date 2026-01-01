@@ -1,0 +1,37 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "a"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DriveToPoseCommand"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "b"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DriveToPoseCommand"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
