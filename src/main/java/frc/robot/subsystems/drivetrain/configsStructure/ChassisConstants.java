@@ -114,11 +114,9 @@ public class ChassisConstants {
      * record containing the relevant information to PathPlanner
      * @param PID_CONSTANTS
      * @param ANGULAR_PID_CONSTANTS
-     * @param massKG
-     * @param MOI
      */
     public record PPChassisConfig( PIDConstants PID_CONSTANTS,
-                                   PIDConstants ANGULAR_PID_CONSTANTS, double massKG, double MOI) {
+                                   PIDConstants ANGULAR_PID_CONSTANTS) {
 
     }
 

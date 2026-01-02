@@ -5,6 +5,7 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.commands.PathfindingCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import io.github.captainsoccer.basicmotor.motorManager.MotorManager;
@@ -19,9 +20,6 @@ public class Robot extends LoggedRobot
     private Command autonomousCommand;
     public Robot()
     {
-
-
-
 //        Logger.recordMetadata("ProjectName", "*GENERIC_ROBOT_PROJECT*"); // Set a metadata value
 
         if (isReal()) {
@@ -34,6 +32,8 @@ public class Robot extends LoggedRobot
         Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
 
         RobotContainer.getInstance();
+
+        PathfindingCommand.warmupCommand().schedule();
     }
 
 

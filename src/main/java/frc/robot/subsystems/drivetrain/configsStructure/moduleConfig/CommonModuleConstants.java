@@ -10,36 +10,13 @@ import io.github.captainsoccer.basicmotor.ctre.talonfx.BasicTalonFXConfig;
  * It bundles together the drive and steer motor config baselines
  * {@link ModuleConfig} used for PP
  */
-public record CommonModuleConstants(BasicTalonFXConfig DRIVE_CONFIG, BasicTalonFXConfig STEER_CONFIG, ModuleConfig MODULE_CONFIG, double STEER_SPEED_REDUCTION) {
 
-
-    /**
-     *
-     * @return the module config for Path Planner.
-     */
-    private static ModuleConfig getModuleConfig(
-            BasicTalonFXConfig driveConfig, BasicTalonFXConfig steerConfig, double wheelCOF, double maxLinearSpeed){
-
-        return new ModuleConfig(
-                //goofy derivation from reversing the unitConversion
-                driveConfig.motorConfig.unitConversion/(2 * Math.PI ),
-                maxLinearSpeed, wheelCOF,
-                driveConfig.motorConfig.motorType.withReduction(driveConfig.motorConfig.gearRatio),
-                driveConfig.currentLimitConfig.statorCurrentLimit, 1);
-    }
-
-
-    /**
-     * @param driveConfig config for drive motor
-     * @param steerConfig config for steer motor
-     * @param wheelCOF coefficient of friction of wheel
-     * @param maxLinearSpeed max linear speed of the module
-     * @param steerSpeedReduction reduction of the steer motor speed, in range of 0-1, multiplies the max steer speed
-     */
-    public CommonModuleConstants(
-            BasicTalonFXConfig driveConfig, BasicTalonFXConfig steerConfig, double wheelCOF, double maxLinearSpeed ,double steerSpeedReduction){
-                this(driveConfig, steerConfig,getModuleConfig(driveConfig, steerConfig, wheelCOF, maxLinearSpeed),steerSpeedReduction);
-    }
+/**
+ * @param DRIVE_CONFIG config for drive motor
+ * @param STEER_CONFIG config for steer motor
+ * @param STEER_SPEED_REDUCTION reduction of the steer motor speed, in range of 0-1, multiplies the max steer speed
+ */
+public record CommonModuleConstants(BasicTalonFXConfig DRIVE_CONFIG, BasicTalonFXConfig STEER_CONFIG, double STEER_SPEED_REDUCTION) {
 
     /**
      *

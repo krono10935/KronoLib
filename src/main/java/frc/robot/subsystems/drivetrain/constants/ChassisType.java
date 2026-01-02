@@ -10,7 +10,7 @@ public enum ChassisType {
     DEVBOT(new ChassisConstants(
             SwerveModulesMK4.getConstants(),
             new ChassisSpeedConfig(1,4), SwerveModulesMK4.getGenericConf(),
-            new PPChassisConfig(new PIDConstants(0),new PIDConstants(0), 30, 6 ),2)),
+            new PPChassisConfig(new PIDConstants(0),new PIDConstants(0)),20)),
     COMPBOT(null);
 
     public final ChassisConstants constants;

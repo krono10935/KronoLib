@@ -34,7 +34,7 @@
   "eventMarkers": [
     {
       "name": "driveToPose",
-      "waypointRelativePos": 0.5142012266355138,
+      "waypointRelativePos": 0.49050332383665807,
       "endWaypointRelativePos": null,
       "command": null
     }

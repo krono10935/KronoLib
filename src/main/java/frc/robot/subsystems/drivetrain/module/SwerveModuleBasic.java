@@ -31,9 +31,8 @@ public class SwerveModuleBasic extends SwerveModuleIO {
             steeringMotor = new BasicTalonFX(constants.STEERING_CONFIG());
 
             canCoder = createCANcoder(constants);
-            steeringMotor.resetEncoder(canCoder.getPosition().getValueAsDouble());
 
-
+            ((BasicTalonFX)steeringMotor).useRemoteCanCoder(canCoder);
 
             canCoder.getMagnetHealth().setUpdateFrequency(4);
             canCoder.optimizeBusUtilization();

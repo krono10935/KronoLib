@@ -97,11 +97,7 @@ public enum SwerveModulesMK4 {
 
         constants = new ModuleConstants(canCoderID, zeroOffset, driveConfig, steerConfig, location,this.name());
 
-
-
     }
-
-
 
     public final ModuleConstants constants;
 
@@ -131,7 +127,7 @@ public enum SwerveModulesMK4 {
         steerConfig.constraintsConfig.minValue = -0.5;
 
 
-        genericConf = new CommonModuleConstants(driveConfig,steerConfig,1,2, 1);
+        genericConf = new CommonModuleConstants(driveConfig,steerConfig,1);
         return genericConf;
     }
 

@@ -20,6 +20,8 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -67,6 +69,7 @@ public class Drivetrain extends SubsystemBase {
 
     private final GyroIO gyro;
 
+    private final Field2d field;
 
 
     public Drivetrain(Supplier<Double> batteryVoltageSupplier, ChassisConstants constants) {
@@ -119,6 +122,10 @@ public class Drivetrain extends SubsystemBase {
 
         setCoast.schedule();
 
+
+        field = new Field2d();
+        SmartDashboard.putData("robotPose", field);
+
     }
 
     public ChassisConstants getConstants() {
@@ -148,13 +155,13 @@ public class Drivetrain extends SubsystemBase {
                 (poses) -> {
                     var posesArr = poses.toArray(new Pose2d[0]);
 
-                    Logger.recordOutput("driveTrain/PathPlanner/active path", posesArr);
+                    Logger.recordOutput("drivetrain/PathPlanner/active path", posesArr);
                 }
         );
 
         PathPlannerLogging.setLogTargetPoseCallback(
                 (pose) -> {
-                    Logger.recordOutput("driveTrain/PathPlanner/target pose", pose);
+                    Logger.recordOutput("drivetrain/PathPlanner/target pose", pose);
                 }
         );
     }
@@ -310,6 +317,8 @@ public class Drivetrain extends SubsystemBase {
 
         Logger.processInputs("drivetrain", inputs);
         Logger.recordOutput("drivetrain/estimated pose", getEstimatedPosition());
+
+        field.setRobotPose(getEstimatedPosition());
 
         String currentCommand = getCurrentCommand() == null ? "None" : getCurrentCommand().getName();
 

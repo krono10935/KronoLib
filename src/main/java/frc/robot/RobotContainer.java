@@ -5,6 +5,7 @@
 
 package frc.robot;
 
+import com.sun.management.DiagnosticCommandMBean;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -27,6 +28,7 @@ public class RobotContainer
     private static RobotContainer instance;
 
     public final Drivetrain drivetrain;
+    private final CommandXboxController controller;
 
     private final LoggedDashboardChooser<Command> chooser;
 
@@ -40,6 +42,7 @@ public class RobotContainer
 
     private RobotContainer()
     {
+        controller = new CommandXboxController(0);
         drivetrain = new Drivetrain(ConduitApi.getInstance()::getPDPVoltage, Constants.CHASSIS_TYPE.constants);
         DriveToPose.configure(
                 new DriveToPoseConstants(
@@ -49,6 +52,8 @@ public class RobotContainer
                         "driveToPose"
                 )
         );
+
+        drivetrain.setDefaultCommand(new DriveCommand(drivetrain, controller));
         configureBindings();
         chooser = new LoggedDashboardChooser<>("chooser", AutoBuilder.buildAutoChooser());
     }
