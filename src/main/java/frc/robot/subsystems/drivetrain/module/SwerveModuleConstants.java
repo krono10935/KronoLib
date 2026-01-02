@@ -7,7 +7,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.drivetrain.DrivetrainConstants;
 import io.github.captainsoccer.basicmotor.BasicMotorConfig;
 import io.github.captainsoccer.basicmotor.BasicMotor.IdleMode;
@@ -17,7 +16,6 @@ import io.github.captainsoccer.basicmotor.ctre.talonfx.BasicTalonFXConfig;
 import io.github.captainsoccer.basicmotor.gains.ConstraintsGains.ConstraintType;
 import io.github.captainsoccer.basicmotor.gains.FeedForwardsGains;
 import io.github.captainsoccer.basicmotor.gains.PIDGains;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public enum SwerveModuleConstants {
 
@@ -69,7 +67,6 @@ public enum SwerveModuleConstants {
             new FeedForwardsGains(0),
             1.3854,0.83239,
             new Translation2d(-0.29, -0.29));
-
 
 
     public static final double WHEEL_RADIUS_METERS = 0.0508;
