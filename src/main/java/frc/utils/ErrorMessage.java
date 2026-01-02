@@ -23,7 +23,7 @@ public class ErrorMessage{
      * @param onTrue a runnable to run once the supplier returns true
      * @param onFalse a runnable to run once the supplier returns true
      */
-    public ErrorMessage(Subsystem subsystem, int code, String message,
+    public ErrorMessage(Subsystem subsystem, String message,
      BooleanSupplier shouldDisplayError, Runnable onTrue, Runnable onFalse) {
 
         this.alert = new Alert(subsystem.getName(),
