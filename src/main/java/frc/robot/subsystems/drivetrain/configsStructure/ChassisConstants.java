@@ -1,11 +1,12 @@
 package frc.robot.subsystems.drivetrain.configsStructure;
-
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.subsystems.drivetrain.configsStructure.moduleConfig.CommonModuleConstants;
 import frc.robot.subsystems.drivetrain.configsStructure.moduleConfig.ModuleConstants;
+import org.json.simple.parser.ParseException;
+
+import java.io.IOException;
 
 /**
  * Chassis-level container for swerve drivetrain configuration.
@@ -66,17 +67,12 @@ public class ChassisConstants {
         this.COMMON_MODULE_CONSTANTS = COMMON_MODULE_CONSTANTS;
         this.GYRO_PORT = GYRO_PORT;
 
-        Translation2d[] moduleTranslations = new Translation2d[MODULE_CONSTANTS.length];
-        for (int i = 0; i < MODULE_CONSTANTS.length; i++) {
-            moduleTranslations[i] = MODULE_CONSTANTS[i].TRANSLATION();
-        }
+       try{
+           ROBOT_CONFIG = RobotConfig.fromGUISettings();
+       } catch (IOException | ParseException e){
+           throw new IllegalArgumentException("PP GUI settings not configured");
 
-       ROBOT_CONFIG = new RobotConfig(
-                PP_CONFIG.massKG(),
-                PP_CONFIG.MOI(),
-                COMMON_MODULE_CONSTANTS.MODULE_CONFIG(),
-                moduleTranslations
-        );
+       }
 
         MAX_ANGULAR_SPEED = SPEED_CONFIG.maxLinearSpeed() / MODULE_CONSTANTS[0].TRANSLATION().getNorm();
 
