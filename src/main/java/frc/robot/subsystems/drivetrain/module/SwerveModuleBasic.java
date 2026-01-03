@@ -47,14 +47,6 @@ public class SwerveModuleBasic extends SwerveModuleIO {
     }
 
     @Override
-    public void setTargetState(SwerveModuleState targetState) {
-        drivingMotor.setControl(targetState.speedMetersPerSecond,ControlMode.VELOCITY);
-        steeringMotor.setControl(targetState.angle.getRotations(),ControlMode.POSITION);
-    }
-
-
-
-    @Override
     protected double getDriveVelocity() {
         return drivingMotor.getVelocity();
     }
@@ -70,27 +62,28 @@ public class SwerveModuleBasic extends SwerveModuleIO {
     }
 
     @Override
+    public void setTargetState(SwerveModuleState targetState) {
+        drivingMotor.setControl(targetState.speedMetersPerSecond,ControlMode.VELOCITY);
+        steeringMotor.setControl(targetState.angle.getRotations(),ControlMode.POSITION);
+    }
+
+    @Override
+    public void setSteerVoltage(double voltage){
+        steeringMotor.setVoltage(voltage);
+    }
+
+    @Override
+    public void setDriveVoltageAndSteerAngle(double voltage, Rotation2d angle) {
+        steeringMotor.setControl(angle.getRotations(), ControlMode.POSITION);
+        drivingMotor.setVoltage(voltage);
+    }
+
+    @Override
     public void setBrakeMode(boolean isBrake) {
         IdleMode idleMode = isBrake ? IdleMode.BRAKE : IdleMode.COAST;
 
         drivingMotor.setIdleMode(idleMode);
         steeringMotor.setIdleMode(idleMode);
-    }
-
-    /**
-     * Auto configs a CANCoder for the module
-     * @param constants
-     * @return A configured CANCoder for the module
-     */
-    private static CANcoder createCANcoder(ModuleConstants constants){
-        CANcoder encoder = new CANcoder(constants.CAN_CODER_ID());
-        var config = new CANcoderConfiguration();
-        config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
-        config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-        config.MagnetSensor.MagnetOffset = -constants.ZERO_OFFSET();
-
-        encoder.getConfigurator().apply(config);
-        return encoder;
     }
 
     @Override
@@ -102,17 +95,19 @@ public class SwerveModuleBasic extends SwerveModuleIO {
         }
     }
 
-    public void setDriveVoltage(double voltage){
-        drivingMotor.setVoltage(voltage);
-    }
+    /**
+     * Auto configs a CANCoder for the module
+     * @param constants The constants of the module
+     * @return A configured CANCoder for the module
+     */
+    private static CANcoder createCANcoder(ModuleConstants constants){
+        CANcoder encoder = new CANcoder(constants.CAN_CODER_ID());
+        var config = new CANcoderConfiguration();
+        config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
+        config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+        config.MagnetSensor.MagnetOffset = -constants.ZERO_OFFSET();
 
-    public void setSteerVoltage(double voltage){
-        steeringMotor.setVoltage(voltage);
-    }
-
-    @Override
-    public void setDriveVoltageAndSteerAngle(double voltage, Rotation2d angle) {
-        steeringMotor.setControl(angle.getRotations(), ControlMode.POSITION);
-        drivingMotor.setVoltage(voltage);
+        encoder.getConfigurator().apply(config);
+        return encoder;
     }
 }

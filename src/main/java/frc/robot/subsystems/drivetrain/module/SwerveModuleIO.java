@@ -18,32 +18,6 @@ public abstract class SwerveModuleIO {
     }
 
     /**
-     * Set the motors to the target state of the system
-     * @param targetState
-     */
-    public abstract void setTargetState(SwerveModuleState targetState);
-
-
-    public SwerveModuleState getState(){
-        return currentState;
-    }
-
-    public SwerveModulePosition getPosition(){
-        return position;
-    }
-
-    /**
-     * Update the module's attributes
-     */
-    public void update(){
-        currentState.angle = Rotation2d.fromRotations(getSteerAngle());
-        position.angle = currentState.angle;
-        currentState.speedMetersPerSecond = getDriveVelocity();
-        position.distanceMeters = getDriveDistance();
-
-    }
-
-    /**
      * @return The drive motor speed in meters per second
      */
     protected abstract double getDriveVelocity();
@@ -59,15 +33,42 @@ public abstract class SwerveModuleIO {
     protected abstract double getSteerAngle();
 
     /**
+     * Sets the target state of the module and gives the command to the module motors
+     */
+    public abstract void setTargetState(SwerveModuleState targetState);
+
+    /**
      * Set if the module is Brake or Coast
-     * @param isBrake
+     * @param isBrake whether the module motor should resist outside change in disable
      */
     public abstract void setBrakeMode(boolean isBrake);
 
+    /**
+     * function used by sysID to profile the behavior of the module
+     * @param voltage the voltage that the drive motor should apply
+     * @param angle the angle of the steer motor
+     */
     public abstract void setDriveVoltageAndSteerAngle(double voltage, Rotation2d angle);
 
     public abstract void setSteerVoltage(double voltage);
 
+    public SwerveModuleState getState(){
+        return currentState;
+    }
 
+    public SwerveModulePosition getPosition(){
+        return position;
+    }
+
+
+    /**
+     * Update the module's attributes
+     */
+    public void update(){
+        currentState.angle = Rotation2d.fromRotations(getSteerAngle());
+        position.angle = currentState.angle;
+        currentState.speedMetersPerSecond = getDriveVelocity();
+        position.distanceMeters = getDriveDistance();
+    }
 
 }
