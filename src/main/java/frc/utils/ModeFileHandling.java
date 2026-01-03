@@ -33,9 +33,7 @@ public class ModeFileHandling {
 
         if(fmsAttached) return false;
 
-        if(!fmsAttached){
-            fmsAttached = DriverStation.isFMSAttached();
-        }
+        fmsAttached = DriverStation.isFMSAttached();
 
         //TODO: set actual check for pit mode
         return true;
