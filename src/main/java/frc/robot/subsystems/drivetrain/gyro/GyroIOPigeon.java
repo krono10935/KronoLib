@@ -25,14 +25,14 @@ public final class GyroIOPigeon implements GyroIO{
     }
 
     @Override
-    public Rotation2d update() {
-        return gyro.getRotation2d().rotateBy(angleOffset);
-    }
-
-    @Override
     public void reset(Pose2d pose) {
         gyro.reset();
         angleOffset = pose.getRotation();
+    }
+
+    @Override
+    public Rotation2d update() {
+        return gyro.getRotation2d().rotateBy(angleOffset);
     }
 
 

@@ -50,12 +50,25 @@ public abstract class SwerveModuleIO {
      */
     public abstract void setDriveVoltageAndSteerAngle(double voltage, Rotation2d angle);
 
+
+    /**
+     * function used by sysID to profile the behavior of the steer motor
+     * @param voltage the voltage that the steer motor should apply
+     */
     public abstract void setSteerVoltage(double voltage);
 
+    /**
+     *
+     * @return the current state of the module
+     */
     public SwerveModuleState getState(){
         return currentState;
     }
 
+    /**
+     *
+     * @return the current position of the module
+     */
     public SwerveModulePosition getPosition(){
         return position;
     }

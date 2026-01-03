@@ -45,7 +45,6 @@ public class ChassisConstants {
 
     public final double MIN_ANGULAR_SPEED; //rad/s
 
-
     public final int GYRO_PORT;
 
     /**
@@ -56,7 +55,7 @@ public class ChassisConstants {
      * @param SPEED_CONFIG  chassis-level speed limits and tuning parameters
      * @param COMMON_MODULE_CONSTANTS      generic module configuration for all the modules
      * @param PP_CONFIG     chassis parameters for PathPlanner (mass, MOI, etc.)
-     * @param GYRO_PORT port/canID number of the gyro. can be overlooked if using Navx
+     * @param GYRO_PORT port/canID number of the gyro.
      */
     public ChassisConstants(ModuleConstants[] MODULE_CONSTANTS,
                             ChassisSpeedConfig SPEED_CONFIG, CommonModuleConstants COMMON_MODULE_CONSTANTS,

@@ -13,6 +13,7 @@ import edu.wpi.first.math.numbers.N3;
 import java.util.Optional;
 
 public interface GyroIO {
+
     /**
      * get the estimated position using the gyro's accelerometer
      * @return the position if implemented
@@ -20,14 +21,14 @@ public interface GyroIO {
     Optional<GyroPoseOutput> getEstimatedPosition();
 
     /**
-     * @return Get the new gyro angle
-     */
-    Rotation2d update();
-
-    /**
      * Reset the gyro angle to another angle
      */
     void reset(Pose2d pose);
+
+    /**
+     * @return Get the new gyro angle
+     */
+    Rotation2d update();
 
     record GyroPoseOutput(Pose2d pose, Matrix<N3, N1> stdDevs){}
 }

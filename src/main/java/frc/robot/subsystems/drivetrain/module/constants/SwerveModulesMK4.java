@@ -100,6 +100,12 @@ public enum SwerveModulesMK4 {
 
     public final ModuleConstants constants;
 
+    private static CommonModuleConstants genericConf;
+
+    /**
+     *
+     * @return the generic config
+     */
     public static CommonModuleConstants getGenericConf(){
         if(genericConf != null) return genericConf;
 
@@ -129,8 +135,6 @@ public enum SwerveModulesMK4 {
         genericConf = new CommonModuleConstants(driveConfig,steerConfig,1);
         return genericConf;
     }
-
-    private static CommonModuleConstants genericConf;
 
     public static ModuleConstants[] getConstants(){
         ModuleConstants[] constants = new ModuleConstants[values().length];

@@ -7,11 +7,11 @@ import io.github.captainsoccer.basicmotor.ctre.talonfx.BasicTalonFXConfig;
  * Simple container record holding all constants required to construct a single
  * swerve module instance.
  *
- * <p>It groups the CANcoder ID and absolute zero offset with the motor configs
+ * <p>It groups the CANCoder ID and absolute zero offset with the motor configs
  * for driving and steering, along with the module's TRANSLATION from the robot
  * center and a human-readable NAME.</p>
  *
- * @param CAN_CODER_ID      CAN ID of the module's absolute encoder (CANcoder)
+ * @param CAN_CODER_ID      CAN ID of the module's absolute encoder (CANCoder)
  * @param ZERO_OFFSET      absolute angle offset in rotations from the zero position
  * @param DRIVING_CONFIG   configuration for the drive TalonFX motor
  * @param STEERING_CONFIG  configuration for the steer TalonFX motor

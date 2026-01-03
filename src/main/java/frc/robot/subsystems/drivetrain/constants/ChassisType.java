@@ -15,7 +15,6 @@ public enum ChassisType {
 
     public final ChassisConstants constants;
 
-
     ChassisType(ChassisConstants constants){
         this.constants = constants;
     }

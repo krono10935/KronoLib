@@ -24,15 +24,15 @@ public final class GyroIOSim implements GyroIO{
     }
 
     @Override
+    public void reset(Pose2d pose) {
+        this.angle = pose.getRotation();
+    }
+
+    @Override
     public Rotation2d update() {
         double omega =speedsSupplier.get().omegaRadiansPerSecond;
         angle = Rotation2d.fromRadians(angle.getRadians() + omega * 0.02);
         return angle;
-    }
-
-    @Override
-    public void reset(Pose2d pose) {
-        this.angle = pose.getRotation();
     }
 
 

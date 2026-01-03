@@ -8,9 +8,7 @@ import io.github.captainsoccer.basicmotor.ctre.talonfx.BasicTalonFXConfig;
  * This record is intended to be shared by all swerve modules on the same chassis.
  * It bundles together the drive and steer motor config baselines
  * {@link ModuleConfig} used for PP
- */
-
-/**
+ *
  * @param DRIVE_CONFIG config for drive motor
  * @param STEER_CONFIG config for steer motor
  * @param STEER_SPEED_REDUCTION reduction of the steer motor speed, in range of 0-1, multiplies the max steer speed

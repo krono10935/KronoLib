@@ -127,10 +127,6 @@ public class Drivetrain extends SubsystemBase {
 
     }
 
-    public ChassisConstants getConstants() {
-        return constants;
-    }
-
     /**
      * configures the AutoBuilder for PP
      */
@@ -222,12 +218,41 @@ public class Drivetrain extends SubsystemBase {
         Logger.recordOutput("drivetrain/target states", previousSetpoint.moduleStates());
     }
 
+    /**
+     * Reset the gyro and the pose estimator states
+     * @param newPose new pose of the robot
+     */
+    public void reset(Pose2d newPose){
+        this.gyro.reset(newPose);
+        poseEstimator.resetPosition(newPose.getRotation(), modulePositions, newPose);
+    }
 
+    /**
+     * Adds the vision measurement
+     *
+     * @param pose      the position where the vision think the robot is there
+     * @param timestamp the time when the pose was taken
+     * @param stdDevs   A Vector with 3 parameters in the following order:
+     *                  X standard deviation (in meters).
+     *                  Y standard deviation (in meters).
+     *                  Theta standard deviation (in radians).
+     */
+    // @Override
+    public void addVisionMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> stdDevs) {
+        poseEstimator.addVisionMeasurement(pose, timestamp, stdDevs);
+    }
 
 
     /**
+     * @return the constants the driveTrain was created with
+     */
+    public ChassisConstants getConstants() {
+        return constants;
+    }
+
+    /**
      * Return the latest gyro angle
-     * (counter clockwise positive)
+     * (counterclockwise positive)
      *
      * @return the gyro angle
      */
@@ -245,20 +270,6 @@ public class Drivetrain extends SubsystemBase {
     }
 
     /**
-     * Adds the vision measurement
-     *
-     * @param pose      the position where the vision think the robot is there
-     * @param timestamp the time when the pose was taken
-     * @param stdDevs   A Vector with 3 parameters in the following order:
-     *                  X standard deviation (in meters).
-     *                  Y standard deviation (in meters).
-     *                  Theta standard deviation (in radians).
-     */
-    // @Override
-    public void addVisionMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> stdDevs) {
-        poseEstimator.addVisionMeasurement(pose, timestamp, stdDevs);
-    }
-    /**
      * Return the latest position of the robot
      *
      * @return the latest pose
@@ -268,20 +279,19 @@ public class Drivetrain extends SubsystemBase {
     }
 
     /**
-     * Reset the gyro and the pose estimator states
-     * @param newPose new pose of the robot
+     * Set if the module is Brake or Coast
+     * @param isBrake whether the module motor should resist outside change in disable
      */
-    public void reset(Pose2d newPose){
-        this.gyro.reset(newPose);
-        poseEstimator.resetPosition(newPose.getRotation(), modulePositions, newPose);
-    }
-
     public void setBrakeMode(boolean isBrake){
         for (SwerveModuleIO module : io){
             module.setBrakeMode(isBrake);
         }
     }
 
+    /**
+     * function used by sysID to profile the behavior of the steer motor
+     * @param voltage the voltage that the steer motor should apply
+     */
     public void setSteerVoltage(double voltage){
         for (SwerveModuleIO module : io){
             module.setSteerVoltage(voltage);
@@ -289,7 +299,11 @@ public class Drivetrain extends SubsystemBase {
     }
 
 
-
+    /**
+     * function used by sysID to profile the behavior of the module
+     * @param voltage the voltage that the drive motor should apply
+     * @param angle the angle of the steer motor
+     */
     public void setDriveVoltageAndSteerAngle(double voltage, Rotation2d[] angle) {
         for (int i = 0; i < 4; i++){
             io[i].setDriveVoltageAndSteerAngle(voltage, angle[i]);
