@@ -13,7 +13,6 @@ import io.github.captainsoccer.basicmotor.gains.PIDGains;
 
 public enum SwerveModulesMK4 {
 
-    //TODO: set actual modules
     FRONT_LEFT(
             12,  0, 10
             ,

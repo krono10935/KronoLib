@@ -1,6 +1,5 @@
 package frc.robot.subsystems.drivetrain.configsStructure.moduleConfig;
 
-import com.pathplanner.lib.config.ModuleConfig;
 import io.github.captainsoccer.basicmotor.ctre.talonfx.BasicTalonFXConfig;
 
 /**

@@ -5,7 +5,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 import java.util.Optional;
-import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 public final class GyroIOSim implements GyroIO{
@@ -13,8 +12,6 @@ public final class GyroIOSim implements GyroIO{
     private final Supplier<ChassisSpeeds> speedsSupplier;
     
     private Rotation2d angle = Rotation2d.kZero;
-
-
 
     public GyroIOSim(Supplier<ChassisSpeeds> speedsSupplier){
         this.speedsSupplier = speedsSupplier;

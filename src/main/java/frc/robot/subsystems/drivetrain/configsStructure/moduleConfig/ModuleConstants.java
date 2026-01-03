@@ -1,7 +1,6 @@
 package frc.robot.subsystems.drivetrain.configsStructure.moduleConfig;
 
 import edu.wpi.first.math.geometry.Translation2d;
-
 import io.github.captainsoccer.basicmotor.ctre.talonfx.BasicTalonFXConfig;
 
 /**

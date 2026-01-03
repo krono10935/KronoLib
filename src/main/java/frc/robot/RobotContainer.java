@@ -5,11 +5,7 @@
 
 package frc.robot;
 
-import com.sun.management.DiagnosticCommandMBean;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommand;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -18,7 +14,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.DriveToPose;
 import com.pathplanner.lib.path.DriveToPoseConstants;
 import edu.wpi.first.wpilibj2.command.*;
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 
@@ -28,7 +23,6 @@ public class RobotContainer
     private static RobotContainer instance;
 
     public final Drivetrain drivetrain;
-    private final CommandXboxController controller;
 
     private final LoggedDashboardChooser<Command> chooser;
 
@@ -42,7 +36,7 @@ public class RobotContainer
 
     private RobotContainer()
     {
-        controller = new CommandXboxController(0);
+
         drivetrain = new Drivetrain(ConduitApi.getInstance()::getPDPVoltage, Constants.CHASSIS_TYPE.constants);
         DriveToPose.configure(
                 new DriveToPoseConstants(
@@ -53,7 +47,6 @@ public class RobotContainer
                 )
         );
 
-        drivetrain.setDefaultCommand(new DriveCommand(drivetrain, controller));
         configureBindings();
         chooser = new LoggedDashboardChooser<>("chooser", AutoBuilder.buildAutoChooser());
     }
