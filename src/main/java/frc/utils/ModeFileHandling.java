@@ -31,11 +31,11 @@ public class ModeFileHandling {
      */
     public static boolean shouldSwitchToPitMode() {
 
+        if(fmsAttached) return false;
+
         if(!fmsAttached){
             fmsAttached = DriverStation.isFMSAttached();
         }
-
-        if(fmsAttached) return false;
 
         //TODO: set actual check for pit mode
         return true;
