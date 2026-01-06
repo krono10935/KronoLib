@@ -27,7 +27,7 @@ public class ErrorMessage{
      BooleanSupplier shouldDisplayError, Runnable onTrue, Runnable onFalse) {
 
         this.alert = new Alert(subsystem.getName(),
-                "Message: " + message,
+                "Error in " + subsystem.getName() + " | Message: " + message,
                 Alert.AlertType.kError
         );
 
