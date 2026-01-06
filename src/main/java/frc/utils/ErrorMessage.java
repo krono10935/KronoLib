@@ -25,17 +25,18 @@ public class ErrorMessage{
     public static void create(Subsystem subsystem, String message,
      BooleanSupplier shouldDisplayError, Runnable onTrue, Runnable onFalse) {
 
+        @SuppressWarnings("resource")
         Alert  alert = new Alert(subsystem.getName(),
                 "Message: " + message,
                 Alert.AlertType.kError
         );
 
         new Trigger(shouldDisplayError).onTrue(
-                new InstantCommand(() -> alert.set(true))
+                new InstantCommand(() -> alert.set(true)).ignoringDisable(true)
                         .andThen(new InstantCommand(onTrue)))
                 .onFalse(
                 new InstantCommand(() -> alert.set(false))
-                        .andThen(new InstantCommand(onFalse)));
+                        .andThen(new InstantCommand(onFalse).ignoringDisable(true)));
     }
 }
 
