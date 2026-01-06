@@ -103,13 +103,23 @@ public class SwerveSysID {
    }
 
     /**
+     * Translate an angle relative to the field to be relative to the robot (30 degrees field turns into 30 degrees robot)
+     * @param rotation Original field relative angle
+     * @param drivetrain The robot to rotate the angle based on it's position in the field
+     * @return The angle on the field translated to the robot relative angle
+     */
+   public static Rotation2d fieldRelativeToRobotRelative(Rotation2d rotation, Drivetrain drivetrain) {
+       return rotation.rotateBy(drivetrain.getGyroAngle().unaryMinus());
+   }
+    /**
      * Drive with a certain amount of power
      * @param voltage Power to apply to the drivetrain
      */
    public void driveWithController(double voltage) {
 
-      Rotation2d angle = new Translation2d(-controller.getLeftX(), -controller.getLeftY()).getAngle().rotateBy(drivetrain.getGyroAngle().unaryMinus());
-      Rotation2d[] angleArray = {angle, angle, angle, angle};
+      Rotation2d fieldRelativeAngle = new Translation2d(-controller.getLeftX(), -controller.getLeftY()).getAngle();
+      Rotation2d robotRelativeAngle = fieldRelativeToRobotRelative(fieldRelativeAngle, drivetrain);
+      Rotation2d[] angleArray = {robotRelativeAngle, robotRelativeAngle, robotRelativeAngle, robotRelativeAngle};
 
       drivetrain.setDriveVoltageAndSteerAngle(voltage, angleArray);
    }
