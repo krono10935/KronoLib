@@ -32,11 +32,16 @@ public class ErrorMessage{
         );
 
         new Trigger(shouldDisplayError).onTrue(
-                new InstantCommand(() -> alert.set(true)).ignoringDisable(true)
-                        .andThen(new InstantCommand(onTrue)))
+                new InstantCommand(() -> alert.set(true))
+                        .andThen(new InstantCommand(onTrue).ignoringDisable(true)))
                 .onFalse(
                 new InstantCommand(() -> alert.set(false))
                         .andThen(new InstantCommand(onFalse).ignoringDisable(true)));
+    }
+
+    public static void create(Subsystem subsystem, String message,
+     BooleanSupplier shouldDisplayError) {
+        create(subsystem, message, shouldDisplayError, null, null);
     }
 }
 
