@@ -10,19 +10,52 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 
+/**
+ * Swerve SYSID command factory
+ */
 public class SwerveSysID {
+    /**
+     * SysID routine for Drive
+     */
    private SysIdRoutine routineDrive;
+    /**
+     * SysID routine for Steer
+     */
    private SysIdRoutine routineSteer;
+    /**
+     * SysID routine for Spin
+     */
    private SysIdRoutine routineSpin;
+    /**
+     * Controller to steer the robot in Drive routine
+     */
    private CommandXboxController controller;
+    /**
+     * Robot's drivetrain to apply the sysID routines to
+     */
    private Drivetrain drivetrain;
 
 
+    /**
+     * Voltage to use in dynamic mode for SYSID
+     */
    public static final double VOLT = 2;
 
+    /**
+     * How many volts/second to add per second of the SYSID routine
+     */
    public static final double VOLT_RAMP_RATE = 0.5;
 
+    /**
+     * How many seconds to perform the test for the sysID routine
+     */
    public static final double TIMEOUT = 10;
+
+    /**
+     * Builds the Swerve SYSID check
+     * @param drivetrain Which drivetrain to apply the SYSID routine to
+     * @param controller Controller to steer the drivetrain during Drive mode
+     */
    public SwerveSysID(Drivetrain drivetrain, CommandXboxController controller) {
       this.controller = controller;
       this.drivetrain = drivetrain;
@@ -69,6 +102,10 @@ public class SwerveSysID {
       );
    }
 
+    /**
+     * Drive with a certain amount of power
+     * @param voltage Power to apply to the drivetrain
+     */
    public void driveWithController(double voltage) {
 
       Rotation2d angle = new Translation2d(-controller.getLeftX(), -controller.getLeftY()).getAngle().rotateBy(drivetrain.getGyroAngle().unaryMinus());
@@ -77,6 +114,9 @@ public class SwerveSysID {
       drivetrain.setDriveVoltageAndSteerAngle(voltage, angleArray);
    }
 
+    /**
+     * Angles to put the wheels at for spin
+     */
    private final Rotation2d[] spinAngleArray = {
            Rotation2d.fromDegrees(135),
            Rotation2d.fromDegrees(135+90),
@@ -84,35 +124,65 @@ public class SwerveSysID {
            Rotation2d.fromDegrees(135+270)
    };
 
+    /**
+     * Spin the robot at a certain power
+     * @param voltage How much power to apply in the spin
+     */
    public void spin(double voltage) {
       drivetrain.setDriveVoltageAndSteerAngle(voltage, spinAngleArray);
    }
 
 
+    /**
+     * Factory for the Quasistatic Drive command
+     * @param direction Apply the test forward or backward
+     * @return A command to apply the sysID test
+     */
    public Command sysIdQuasistaticDrive(SysIdRoutine.Direction direction) {
       return routineDrive.quasistatic(direction);
    }
 
-
+    /**
+     * Factory for the Dynamic Drive command
+     * @param direction Apply the test forward or backward
+     * @return A command to apply the sysID test
+     */
    public Command sysIdDynamicDrive(SysIdRoutine.Direction direction) {
       return routineDrive.dynamic(direction);
    }
 
-
+    /**
+     * Factory for the Quasistatic Steer command
+     * @param direction Apply the test forward or backward
+     * @return A command to apply the sysID test
+     */
    public Command sysIdQuasistaticSteer(SysIdRoutine.Direction direction) {
       return routineSteer.quasistatic(direction);
    }
 
-
+    /**
+     * Factory for the Dynamic Steer command
+     * @param direction Apply the test forward or backward
+     * @return A command to apply the sysID test
+     */
    public Command sysIdDynamicSteer(SysIdRoutine.Direction direction) {
       return routineSteer.dynamic(direction);
    }
 
+    /**
+     * Factory for the Quasistatic Spin command
+     * @param direction Apply the test forward or backward
+     * @return A command to apply the sysID test
+     */
    public Command sysIdQuasistaticSpin(SysIdRoutine.Direction direction) {
       return routineSpin.quasistatic(direction);
    }
 
-
+    /**
+     * Factory for the Dynamic Spin command
+     * @param direction Apply the test forward or backward
+     * @return A command to apply the sysID test
+     */
    public Command sysIdDynamicSpin(SysIdRoutine.Direction direction) {
       return routineSpin.dynamic(direction);
    }
