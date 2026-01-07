@@ -1,0 +1,161 @@
+package frc.robot.subsystems.Vision;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.function.DoubleSupplier;
+
+import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.units.Unit;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
+import org.photonvision.PhotonPoseEstimator;
+
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+public class VisionConstants {
+      /**
+     * Max height deviation for vision targets (in meters)
+     */
+    public static final double MAX_HEIGHT_DEV = 0.1;
+    /**
+     * Max ambiguity for multi-tag targets (0,one hunderd precent sure to 1, random.next)
+     */
+    public static final double MAX_MULTI_AMBIGUTY = 0.3;
+    /**
+     * Max ambiguity for single-tag targets (0 to 1)
+     */
+    public static final double MAX_SINGLE_AMBIGUTY = 0.1;
+
+
+    // enum with all the camera constants
+    enum CamerasConstants {
+//         Define the camera constants for the front cameraP
+        FRONT_CAMERA(
+            PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY,
+            "dolev",
+                new Transform3d(new Translation3d(0.275,0.015,0.08),new Rotation3d(0,Units.degreesToRadians(-33.9),Units.degreesToRadians(-1.3))),
+            0.76, // XY standard deviation factor
+            0.67, // Theta standard deviation factor
+             0.05,// Minimum XY standard deviation
+              Math.toRadians(5)// Minimum Theta standard deviation
+
+        ),
+        FRONT_CAMERA_2(
+            PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY,
+            "bohen",
+            new Transform3d(
+                new Translation3d(0.235, 0.1, 0.065),
+                new Rotation3d(Units.degreesToRadians(-1.7),  Units.degreesToRadians(-31.5),Units.degreesToRadians(2))
+
+            ),
+            0.67, // XY standard deviation factor
+            0.76, // Theta standard deviation factor
+             0.05,// Minimum XY standard deviation
+              Math.toRadians(5)// Minimum Theta standard deviation
+
+
+        );
+        
+       
+        /**
+         * The main strategy for the camera
+         */
+        public static final PhotonPoseEstimator.PoseStrategy MAIN_STRATEGY = PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
+        
+       /**
+        * The alternate strategy for the camera
+        */
+        public final PhotonPoseEstimator.PoseStrategy ALTERNATE_STRATEGY;
+
+        /**
+         * The name of the camera
+         */
+        public final String CAMERA_NAME;
+        
+                /**
+                 * The transform from the robot to the camera
+                 */ 
+                public final Transform3d ROBOT_TO_CAMERA;
+        
+                /**
+                 * The standard deviation factor for XY
+                 */
+                public final double XY_STD_DEV_FACTOR;
+                public final LoggedNetworkNumber MIN_XY_STD_DEV_NETWORK;
+        
+                /**
+                 * The standard deviation factor for Theta
+                 */
+                public final double THETA_STD_DEV_FACTOR;
+
+                public final LoggedNetworkNumber MIN_THETA_STD_DEV_NETWORK ;
+            
+                
+                /**
+                 * The minimum standard deviation for XY (in meters)
+                 */
+                public final double MIN_XY_STD_DEV;
+                
+                /**
+                 * The minimum standard deviation for Theta (in radians)
+                 */
+                public final double MIN_THETA_STD_DEV;
+                
+                public final double MAX_XY_STD_DEV = 200; // Maximum XY standard deviation (in meters)
+                public final double MAX_THETA_STD_DEV = Math.toRadians(180); // Maximum Theta standard deviation (in radians)
+        
+                // Constructor for the camera constants
+                CamerasConstants(
+                PhotonPoseEstimator.PoseStrategy alternateStrategy, 
+                String cameraName, 
+                Transform3d robotToCamera,
+                double xyStdFactor,
+                double thetaStdFactor,
+                double minXYStd,
+                double minThetaStd) {
+                    
+        
+                    this.ALTERNATE_STRATEGY = alternateStrategy;
+        
+                    this.CAMERA_NAME = cameraName;
+
+            this.ROBOT_TO_CAMERA = robotToCamera;
+
+            //TODO: determaine unit for standard deviation factor
+            this.XY_STD_DEV_FACTOR = xyStdFactor;
+
+            this.THETA_STD_DEV_FACTOR = thetaStdFactor;
+
+            this.MIN_XY_STD_DEV = minXYStd;
+
+            MIN_XY_STD_DEV_NETWORK = new LoggedNetworkNumber("/Tuning/XYSTDDEV/" + this.CAMERA_NAME, xyStdFactor);
+
+            this.MIN_THETA_STD_DEV = minThetaStd;
+
+            MIN_THETA_STD_DEV_NETWORK = new LoggedNetworkNumber("/Tuning/THETASTDDEV/"+ this.CAMERA_NAME,thetaStdFactor);
+        }
+
+
+
+
+        
+    }
+    /**
+     * The field layout for the 2025 FRC game "Reefscape"
+     */
+
+
+    public static final AprilTagFieldLayout FIELD_LAYOUT =getFieldLayout(new AprilTag(
+            1,new Pose3d(new Translation3d(0,0,0.23), new Rotation3d(Units.degreesToRadians(0),0,0))),
+            new AprilTag(21, new Pose3d(new Translation3d(0,0.45,0.42), new Rotation3d()) ));
+
+    public static AprilTagFieldLayout  getFieldLayout(AprilTag... tag) {
+        return new AprilTagFieldLayout(Arrays.stream(tag).toList(),5.0,5.0 );
+    }
+}
