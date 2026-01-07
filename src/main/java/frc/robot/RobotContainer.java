@@ -38,14 +38,6 @@ public class RobotContainer
     {
 
         drivetrain = new Drivetrain(ConduitApi.getInstance()::getPDPVoltage, Constants.CHASSIS_TYPE.constants);
-        DriveToPose.configure(
-                new DriveToPoseConstants(
-                        drivetrain::getEstimatedPosition,
-                        drivetrain::getChassisSpeeds,
-                        drivetrain::drive,
-                        "driveToPose"
-                )
-        );
 
         configureBindings();
         chooser = new LoggedDashboardChooser<>("chooser", AutoBuilder.buildAutoChooser());

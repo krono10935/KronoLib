@@ -1,6 +1,7 @@
 package frc.robot.subsystems.drivetrain.configsStructure;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.subsystems.drivetrain.configsStructure.moduleConfig.CommonModuleConstants;
 import frc.robot.subsystems.drivetrain.configsStructure.moduleConfig.ModuleConstants;
@@ -47,6 +48,8 @@ public class ChassisConstants {
 
     public final int GYRO_PORT;
 
+    public final PathConstraints PATH_FINDING_CONSTRAINTS;
+
     /**
      * Create chassis constants and derive the PathPlanner {@link RobotConfig} from the
      * provided module and chassis parameters.
@@ -59,14 +62,15 @@ public class ChassisConstants {
      */
     public ChassisConstants(ModuleConstants[] MODULE_CONSTANTS,
                             ChassisSpeedConfig SPEED_CONFIG, CommonModuleConstants COMMON_MODULE_CONSTANTS,
-                            PPChassisConfig PP_CONFIG, int GYRO_PORT) {
+                            PPChassisConfig PP_CONFIG, int GYRO_PORT, PathConstraints pathFindingConstraints) {
         this.MODULE_CONSTANTS = MODULE_CONSTANTS;
         this.SPEED_CONFIG = SPEED_CONFIG;
         this.PP_CONFIG = PP_CONFIG;
         this.COMMON_MODULE_CONSTANTS = COMMON_MODULE_CONSTANTS;
         this.GYRO_PORT = GYRO_PORT;
+        this.PATH_FINDING_CONSTRAINTS = pathFindingConstraints;
 
-       try{
+        try{
            ROBOT_CONFIG = RobotConfig.fromGUISettings();
        } catch (IOException | ParseException e){
            throw new IllegalArgumentException("PP GUI settings not configured");

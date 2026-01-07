@@ -11,21 +11,9 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "DriveToPoseCommand"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "b"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "DriveToPoseCommand"
           }
         }
       ]

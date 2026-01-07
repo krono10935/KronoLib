@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -143,6 +144,7 @@ public class Drivetrain extends SubsystemBase {
                 ),
                 config, // The robot configuration
                 ChassisConstants::shouldFlipPath,
+                "driveToPose",
                 this // Reference to this subsystem to set requirements
         );
 
@@ -276,6 +278,11 @@ public class Drivetrain extends SubsystemBase {
      */
     public Pose2d getEstimatedPosition() {
         return poseEstimator.getEstimatedPosition();
+    }
+
+    public Command driveToPose(Pose2d goalPose, double distanceToStopPP){
+        return AutoBuilder.pathfindToPose(goalPose, constants.PATH_FINDING_CONSTRAINTS,
+                0, distanceToStopPP);
     }
 
     /**
