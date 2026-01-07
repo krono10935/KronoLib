@@ -25,7 +25,7 @@ public class ErrorMessage{
     public static void create(Subsystem subsystem, String message,
      BooleanSupplier shouldDisplayError, Runnable onTrue, Runnable onFalse) {
 
-        @SuppressWarnings("resource")
+//        @SuppressWarnings("resource")
         Alert  alert = new Alert(subsystem.getName(),
                 "Message: " + message,
                 Alert.AlertType.kError
@@ -41,7 +41,7 @@ public class ErrorMessage{
 
     public static void create(Subsystem subsystem, String message,
      BooleanSupplier shouldDisplayError) {
-        create(subsystem, message, shouldDisplayError, null, null);
+        create(subsystem, message, shouldDisplayError, () -> {}, () -> {});
     }
 }
 
