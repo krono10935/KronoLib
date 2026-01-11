@@ -4,6 +4,7 @@
 
 package frc.utils;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -19,30 +20,22 @@ public class ErrorMessage{
     /**
      * Store errors
      */
-    private static record ErrorMessageRecord(Alert alert, BooleanSupplier shouldDisplayError, Consumer<BooleanSupplier> callback) {
+    private static record ErrorMessageRecord(Alert alert, BooleanSupplier shouldDisplayError, Consumer<Boolean> callback) {
         /**
          * Run a specfic error record
          */
         public void Run(){
-            if (shouldDisplayError.getAsBoolean()){
-                if (!alert.get()){
-                    alert.set(true);
-                    callback.accept(shouldDisplayError);
-                }
+            if (shouldDisplayError.getAsBoolean() != alert.get()){
+                alert.set(!alert.get());
+                callback.accept(alert.get());
             }
-            if (!shouldDisplayError.getAsBoolean()){
-                if (alert.get()){
-                    alert.set(false);
-                    callback.accept(shouldDisplayError);
-                }
-            }
-        }  
+        }   
     }
 
     /**
      * A list of error storage
      */
-    private static List<ErrorMessageRecord> errors;
+    private final static List<ErrorMessageRecord> errors = new LinkedList<ErrorMessageRecord>();
 
     /**
      * @param subsystem the subsystem which is sending the error
@@ -60,11 +53,11 @@ public class ErrorMessage{
                 Alert.AlertType.kError
         );
 
-        Consumer<BooleanSupplier> callback = (BooleanSupplier shouldDisplayErrorCallback) -> {
-            if (shouldDisplayErrorCallback.getAsBoolean()){
+        Consumer<Boolean> callback = (Boolean isActive) -> {
+            if (isActive){
                 onTrue.run();
             }
-            if (!shouldDisplayErrorCallback.getAsBoolean()){
+            else {
                 onFalse.run();
             }
         };
@@ -86,7 +79,7 @@ public class ErrorMessage{
     /**
      * Run each error
      */
-    public static void UpdateErrors(){
+    public static void updateErrors(){
         errors.forEach((error) -> error.Run());
     }
 }
