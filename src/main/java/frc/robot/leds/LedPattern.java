@@ -5,5 +5,12 @@ package frc.robot.leds;
  */
 public enum LedPattern {
     RAINBOW,
-    SKEBOB
+    SOLID,
+    BLINK;
+
+
+    @Override
+    public String toString(){
+        return this.name().toLowerCase();
+    }
 }

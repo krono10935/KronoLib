@@ -1,88 +1,25 @@
 package frc.robot.leds;
 
+import java.util.ArrayList;
+
 import edu.wpi.first.networktables.*;
-import edu.wpi.first.wpilibj.AddressableLED;
-import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.LEDPattern;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 
-import java.util.function.Supplier;
 
 /**
  * Manages the robot LED state by publishing it to NetworkTables.
  * <p>
  */
 public class LedManager {
+    private final StructArrayPublisher<LedState> publisher;
 
-    /**
-     * Represents a given ledstate which the leds should have (position, colors, frequency, and pattern)
-     * @param pattern  pattern to use on the given leds
-     * @param mainColor primary color of the pattern
-     * @param secondaryColor secondary color of the pattern
-     * @param hz frequency of the pattern
-     * @param ledLineID which ledLine to display the pattern on
-     * @param start where to start the pattern on that ledline
-     * @param end where to end the pattern on that ledline
-     */
-    public record LedState(String pattern, Color mainColor, Color secondaryColor, double hz, int ledLineID, int start, int end){
-        public LedState(LedPattern pattern, Color mainColor, Color secondaryColor, double hz, LedLocation location){
-            this(pattern.toString(), mainColor, secondaryColor, hz, location.ledLineID,  location.start, location.end);
-        }
-    }
-
-    /**
-     * The Network Tables entry for the ledlineID
-     */
-    private final NetworkTableEntry ledLineIDEntry;
-    /**
-     * The Network Tables entry for the pattern
-     */
-    private final NetworkTableEntry patternEntry;
-    /**
-     * The Network Tables entry for the main color
-     */
-    private final NetworkTableEntry mainColorEntry;
-
-    /**
-     * The Network Tables entry for the secondary color
-     */
-    private final NetworkTableEntry secondaryColorEntry;
-
-    /**
-     * The Network Tables entry for the frequency of the pattern
-     */
-    private final NetworkTableEntry hzEntry;
-
-    /**
-     * The Network Tables entry for the range in which the leds will have the pattern
-     */
-    private final NetworkTableEntry rangeEntry;
-    /**
-     * Updates whether or a change has been made to the entry
-     */
-    private final NetworkTableEntry hasChangeEntry;
+    private ArrayList<LedState> list = new ArrayList<>();
 
     public LedManager() {
         var nt = NetworkTableInstance.getDefault();
 
-        var table = nt.getTable("Led");
-
-
-        ledLineIDEntry = table.getEntry("id");
-
-        patternEntry = table.getEntry("pattern");
-
-        mainColorEntry = table.getEntry("mainColor");
-
-        secondaryColorEntry = table.getEntry("secondaryColor");
-
-        hzEntry = table.getEntry("hz");
-
-        rangeEntry = table.getEntry("range");
-
-        hasChangeEntry = table.getEntry("hasChange");
-
+        publisher = nt.getTable("Led").getStructArrayTopic("states", LedState.struct).publish();
+    
     }
 
     /**
@@ -92,31 +29,17 @@ public class LedManager {
      * @param state the led state to activate for the robot
      */
     public void setColors(LedState state){
-        ledLineIDEntry.setInteger(state.ledLineID);
-        patternEntry.setString(state.pattern);
-        mainColorEntry.setDoubleArray(convertColorToDoubleArr(state.mainColor));
-        secondaryColorEntry.setDoubleArray(convertColorToDoubleArr(state.secondaryColor));
-        hzEntry.setDouble(state.hz);
-        rangeEntry.setDoubleArray(new double[]{state.start, state.end});
-        hasChangeEntry.setBoolean(true);
+        list.add(state);
     }
 
+    public void periodic(){
+        if(list.isEmpty()) return;
+        
+        LedState[] arr = list.toArray(new LedState[0]);
 
-    /**
-     * util to convert a color to an array to publish to network tables
-     * @param color chosen color
-     * @return the color in {r,g,b}
-     */
-    private static double[] convertColorToDoubleArr(Color color){
-        return new double[]{color.red,color.green,color.blue};
+        list = new ArrayList<>();
+
+        publisher.set(arr);
     }
-
-
-
-
-
-
-
-
 
 }

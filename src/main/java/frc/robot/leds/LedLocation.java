@@ -4,14 +4,10 @@ package frc.robot.leds;
  * Location of the leds including Line id, start led, end led
  */
 public enum LedLocation{
-    BASE(0,0,1),
-    ARM(1,1,2),
-    END_EFFECTOR(2,2,3);
-
-    /**
-     * Ledline to control
-     */
-    public final int ledLineID;
+    BASE(0,10),
+    ARM(11,20),
+    END_EFFECTOR(2,3),
+    ALL(0, 20);
 
     /**
      * Starting led for the pattern on the ledline
@@ -25,12 +21,10 @@ public enum LedLocation{
 
     /**
      * Construct a Ledlocation enum.
-     * @param ledLineID Ledline id to access
      * @param start Start position on the ledline
      * @param end End position on the ledline
      */
-    LedLocation(int ledLineID,int start, int end){
-        this.ledLineID = ledLineID;
+    LedLocation(int start, int end){
         this.start = start;
         this.end = end;
     }
