@@ -5,18 +5,50 @@ import edu.wpi.first.wpilibj.util.Color;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Creates an LED state
+ * @param pattern the name of the pattern you want to use
+ * @param mainColor The primary color of the pattern
+ * @param secondaryColor The seconder color of the pattern (like a background)
+ * @param hz how many times does the pattern repeat itself in a second.
+ * @param brightness how bright is the pattern (0-1)
+ * @param start where does the pattern start on the strip
+ * @param end where does the pattern end of the strip
+ * @param timeout how much time should the pattern be alive for, 0 is for always, any other value will cancel after the set amount
+ */
 public record LedState(String pattern, Color mainColor, Color secondaryColor, 
                         double hz, double brightness, int start, int end, double timeout) {
 
-                            public LedState(LedPattern pattern, Color mainColor, Color secondaryColor, double hz, double brightness, LedLocation location){
-                                this(pattern.toString(), mainColor, secondaryColor, hz, brightness, location.start, location.end, 0);
-                            }
-                    
-                            public LedState(LedPattern pattern, Color mainColor, Color secondaryColor, double hz, double brightness, LedLocation location, double timeout){
-                                this(pattern.toString(), mainColor, secondaryColor, hz, brightness, location.start, location.end, timeout);
-                            }
+    /**
+     * Creates an LED state
+     * @param pattern the name of the pattern you want to use
+     * @param mainColor The primary color of the pattern
+     * @param secondaryColor The seconder color of the pattern (like a background)
+     * @param hz how many times does the pattern repeat itself in a second.
+     * @param brightness how bright is the pattern (0-1)
+     * @param location Where is the pattern
+     */
+    public LedState(LedPattern pattern, Color mainColor, Color secondaryColor, double hz, double brightness, LedLocation location){
+        this(pattern.toString(), mainColor, secondaryColor, hz, brightness, location.start, location.end, 0);
+    }
+
+    /**
+     * Creates an LED state
+     * @param pattern the name of the pattern you want to use
+     * @param mainColor The primary color of the pattern
+     * @param secondaryColor The seconder color of the pattern (like a background)
+     * @param hz how many times does the pattern repeat itself in a second.
+     * @param brightness how bright is the pattern (0-1)
+     * @param location Where is the pattern
+     * @param timeout how much time should the pattern be alive for, 0 is for always, any other value will cancel after the set amount
+     */
+
+    public LedState(LedPattern pattern, Color mainColor, Color secondaryColor, double hz, double brightness, LedLocation location, double timeout){
+        this(pattern.toString(), mainColor, secondaryColor, hz, brightness, location.start, location.end, timeout);
+    }
 
 
+    // DO NOT TOUCH IT'S BLACK MAGIC
     public static final Struct<LedState> struct = new Struct<>() {
         private static final int STR_MAX = 16;
 

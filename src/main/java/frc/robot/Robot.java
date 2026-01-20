@@ -5,18 +5,12 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.leds.LedLocation;
-import frc.robot.leds.LedPattern;
-import frc.robot.leds.LedState;
 import io.github.captainsoccer.basicmotor.motorManager.MotorManager;
-import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
-import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 
@@ -66,7 +60,6 @@ public class Robot extends LoggedRobot
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
         MotorManager.getInstance().periodic(); // must run AFTER CommandScheduler
-        RobotContainer.getInstance().getLedManager().periodic();
     }
     
     
@@ -85,9 +78,6 @@ public class Robot extends LoggedRobot
     @Override
     public void autonomousInit()
     {
-        RobotContainer.getInstance().getLedManager().setColors(new LedState(LedPattern.SOLID, Color.kRed, Color.kBlack, 1, 0.2, LedLocation.BASE));
-        RobotContainer.getInstance().getLedManager().setColors(new LedState(LedPattern.RAINBOW, Color.kRed, Color.kBlack, 1, 0.2, LedLocation.ARM));
-        
         autonomousCommand = RobotContainer.getInstance().getAutonomousCommand();
         
         if (autonomousCommand != null)
@@ -108,7 +98,6 @@ public class Robot extends LoggedRobot
     @Override
     public void teleopInit()
     {
-        RobotContainer.getInstance().getLedManager().setColors(new LedState(LedPattern.BLINK, Color.kBlue, Color.kBlack, 5, 0.2, LedLocation.ALL, 5));
         if (autonomousCommand != null)
         {
             autonomousCommand.cancel();

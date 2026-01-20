@@ -6,7 +6,8 @@ package frc.robot.leds;
 public enum LedPattern {
     RAINBOW,
     SOLID,
-    BLINK;
+    BLINK,
+    RSL_BLINK;
 
 
     @Override

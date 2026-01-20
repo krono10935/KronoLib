@@ -10,19 +10,19 @@ public enum LedLocation{
     ALL(0, 20);
 
     /**
-     * Starting led for the pattern on the ledline
+     * Starting led for the pattern on the LED strip
      */
     public final int start;
 
     /**
-     * Last led in the pattern for the ledline
+     * Last led in the pattern for the LED strip
      */
     public final int end;
 
     /**
      * Construct a Ledlocation enum.
-     * @param start Start position on the ledline
-     * @param end End position on the ledline
+     * @param start Start position on the LED strip
+     * @param end End position on the LED strip
      */
     LedLocation(int start, int end){
         this.start = start;
