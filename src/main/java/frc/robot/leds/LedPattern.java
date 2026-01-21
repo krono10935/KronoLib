@@ -7,7 +7,8 @@ public enum LedPattern {
     RAINBOW,
     SOLID,
     BLINK,
-    RSL_BLINK;
+    RSL_BLINK,
+    SKEBOB;
 
 
     @Override

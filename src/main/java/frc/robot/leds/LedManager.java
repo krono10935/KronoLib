@@ -1,7 +1,5 @@
 package frc.robot.leds;
 
-import java.util.ArrayList;
-
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.networktables.*;
@@ -16,14 +14,9 @@ import frc.robot.Robot;
  */
 public class LedManager extends SubsystemBase {
     /**
-     * The publisher for the LED states
+     * A list of all the strips connected to the LED controller
      */
-    private final StructArrayPublisher<LedState> publisher;
-
-    /**
-     * The array holding the next states of the LED
-     */
-    private ArrayList<LedState> list = new ArrayList<>();
+    private final LEDStrip strip;
 
     /**
      * The status of the rsl light, used to sync the leds with the rsl.
@@ -34,11 +27,9 @@ public class LedManager extends SubsystemBase {
      * Creates a new LED manager
      */
     public LedManager() {
-        var ntTable = NetworkTableInstance.getDefault().getTable("Led");
+        rslStatus = NetworkTableInstance.getDefault().getTable("Led").getEntry("RslStatus");
 
-        publisher = ntTable.getStructArrayTopic("states", LedState.struct).publish();
-
-        rslStatus = ntTable.getEntry("RslStatus");
+        strip = new LEDStrip(18);
     }
 
     /**
@@ -48,7 +39,7 @@ public class LedManager extends SubsystemBase {
      * @param state the LED state to activate for the robot
      */
     public void setColors(LedState state){
-        list.add(state);
+        strip.addPattern(state);
     }
 
     @Override
@@ -56,13 +47,7 @@ public class LedManager extends SubsystemBase {
         if(Robot.isReal()) rslStatus.setBoolean(RobotController.getRSLState());
         else Logger.runEveryN(25, () -> rslStatus.setBoolean(!rslStatus.getBoolean(false)));
         
-        if(list.isEmpty()) return;
-        
-        LedState[] arr = list.toArray(new LedState[0]);
-
-        list = new ArrayList<>();
-
-        publisher.set(arr);
+        strip.publish();
     }
 
 }
